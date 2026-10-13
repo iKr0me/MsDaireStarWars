@@ -1,0 +1,226 @@
+{
+  "description": "User-selected Sketchfab models and two X-wing variants for Ms. Daire\u2019s Galaxy. Original creator/license/source metadata is copied from the supplied GLBs; it has not been independently reverified online.",
+  "sourceFilesUnchanged": true,
+  "selectedSceneFiles": [
+    "r2d2_starwars_fanart.glb",
+    "planet_of_phoenix.glb",
+    "stylized_x-_wing_without_r2d2.glb",
+    "millennium_falcon.glb",
+    "tie_fighter_-_star_wars.glb",
+    "death_star_-_star_wars.glb"
+  ],
+  "orientationPolicy": "Preserve source hierarchies; inspect each asset separately and normalize using application wrappers. No shared ship-nose direction or scale is promised.",
+  "originals": [
+    {
+      "file": "stylized_x-_wing.glb",
+      "kind": "original",
+      "role": "Untouched source X-wing with R2 and original closed canopy; reference for the two variants",
+      "bytes": 1065320,
+      "sha256": "583fe46fe87dd5806369c803e4bf825adcfaa40a4b49c0ace25ad3a3c4074b4f",
+      "embeddedAssetMetadata": {
+        "extras": {
+          "author": "Alexander G\u00fcnther (https://sketchfab.com/AlexanderGuenther)",
+          "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+          "source": "https://sketchfab.com/3d-models/stylized-x-wing-645505dd04f9401390d942ec278fb4e0",
+          "title": "Stylized X- Wing"
+        },
+        "generator": "Sketchfab-15.8.0",
+        "version": "2.0"
+      },
+      "extensionsUsed": [],
+      "animationClipCount": 0
+    },
+    {
+      "file": "millennium_falcon.glb",
+      "kind": "original",
+      "role": "Send-confirmed pickup animation",
+      "bytes": 9176284,
+      "sha256": "c30a95a662896d862c329086922af35d57ccbbab461d7c0811870fddcae64348",
+      "embeddedAssetMetadata": {
+        "extras": {
+          "author": "GaryPhelps (https://sketchfab.com/GaryPhelps)",
+          "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+          "source": "https://sketchfab.com/3d-models/millennium-falcon-2c9c1cfa4b6d49eab054ef9067d14dbc",
+          "title": "Millennium Falcon"
+        },
+        "generator": "Sketchfab-12.66.0",
+        "version": "2.0"
+      },
+      "extensionsUsed": [],
+      "animationClipCount": 0
+    },
+    {
+      "file": "tie_fighter_-_star_wars.glb",
+      "kind": "original",
+      "role": "Distant chase craft",
+      "bytes": 3125940,
+      "sha256": "1ce37a5597172768909a945dd1868c02179a96345edec254c7c5ea56a358fba8",
+      "embeddedAssetMetadata": {
+        "extras": {
+          "author": "Quiznos323 (https://sketchfab.com/quiznos323)",
+          "license": "CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)",
+          "source": "https://sketchfab.com/3d-models/tie-fighter-star-wars-d56bad4ed6f84b4fb51315e7fd8b20e2",
+          "title": "TIE Fighter - Star Wars"
+        },
+        "generator": "Sketchfab-16.12.0",
+        "version": "2.0"
+      },
+      "extensionsUsed": [
+        "KHR_materials_emissive_strength"
+      ],
+      "animationClipCount": 0
+    },
+    {
+      "file": "death_star_-_star_wars.glb",
+      "kind": "original",
+      "role": "Distant background Death Star",
+      "bytes": 2045496,
+      "sha256": "ebf193f2c49896e82bd87d83568369bd451f8d85ddd0b630c87a2b36060635c4",
+      "embeddedAssetMetadata": {
+        "extras": {
+          "author": "Quiznos323 (https://sketchfab.com/quiznos323)",
+          "license": "CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)",
+          "source": "https://sketchfab.com/3d-models/death-star-star-wars-423fb92f677f4448aef407112a1fc032",
+          "title": "Death Star - Star Wars"
+        },
+        "generator": "Sketchfab-16.12.0",
+        "version": "2.0"
+      },
+      "extensionsUsed": [
+        "KHR_materials_emissive_strength"
+      ],
+      "animationClipCount": 0
+    },
+    {
+      "file": "coruscant.glb",
+      "kind": "original",
+      "role": "Coruscant at the bottom-right of the scene",
+      "bytes": 2675488,
+      "sha256": "ef100c75f9373e041679d84c04a29fb46f5c421f0bc54043cfadf6e797ba5879",
+      "embeddedAssetMetadata": {
+        "extras": {
+          "author": "Mateusz Woli\u0144ski (https://sketchfab.com/jeandiz)",
+          "license": "CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)",
+          "source": "https://sketchfab.com/3d-models/coruscant-802db255f49e4e1e8d398213ecc371ae",
+          "title": "Coruscant"
+        },
+        "generator": "Sketchfab-13.42.0",
+        "version": "2.0"
+      },
+      "extensionsUsed": [],
+      "animationClipCount": 0
+    },
+    {
+      "file": "r2d2_starwars_fanart.glb",
+      "kind": "original",
+      "role": "Standalone interactive floating droid",
+      "bytes": 15334228,
+      "sha256": "c9cd460311ebec3f7c26c39f8428c8711fbb67452fc0a7646674a5388194e045",
+      "embeddedAssetMetadata": {
+        "extras": {
+          "author": "eknightger (https://sketchfab.com/eknightger)",
+          "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+          "source": "https://sketchfab.com/3d-models/r2d2-starwars-fanart-0bcc8566756543d396dec37a8c425e7b",
+          "title": "r2d2 starwars fanart"
+        },
+        "generator": "Sketchfab-12.66.0",
+        "version": "2.0"
+      }
+    },
+    {
+      "file": "planet_of_phoenix.glb",
+      "kind": "original",
+      "role": "Slowly rotating background planet",
+      "bytes": 51540496,
+      "sha256": "7e9e8e1e09499343e00d6170ead57956d69fc17b5b5f255d63fe4941c37bc2df",
+      "embeddedAssetMetadata": {
+        "extras": {
+          "author": "ARCTIC  WOLVES\u2122 (https://sketchfab.com/arctic.wolves)",
+          "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+          "source": "https://sketchfab.com/3d-models/planet-of-phoenix-bbe2737a863445f7bb2a6901d10b090a",
+          "title": "Planet Of Phoenix"
+        },
+        "generator": "Sketchfab-16.51.0",
+        "version": "2.0"
+      }
+    }
+  ],
+  "variants": [
+    {
+      "file": "stylized_x-_wing_open_cockpit.glb",
+      "derivedFrom": "stylized_x-_wing.glb",
+      "role": "Interactive R2 hero X-wing; open canopy, R2 retained",
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "integrationNodes": {
+        "XWING_CANOPY_PIVOT": {
+          "parent": "Main",
+          "translation": [
+            0,
+            -3.6759,
+            1.2783
+          ],
+          "localRotationAxis": "X",
+          "openAngleDegrees": -55
+        },
+        "R2_HEAD": {
+          "purpose": "Pivot for the original exposed R2 dome",
+          "translation": [
+            0,
+            -2.843005,
+            1.327547
+          ],
+          "localYawAxis": "Z"
+        },
+        "R2_DOME_MESH": {
+          "parent": "R2_HEAD",
+          "purpose": "Original dome geometry, offset by the inverse pivot translation"
+        },
+        "R2_NOTE_ORIGIN": {
+          "parent": "R2_HEAD",
+          "translation": [
+            0,
+            0,
+            0.78
+          ],
+          "purpose": "Empty note-launch anchor"
+        }
+      },
+      "changes": [
+        "Extracted and opened the original canopy with a separate hinge pivot",
+        "Retained the original exposed R2 dome and added its yaw pivot",
+        "Added an empty note-launch anchor",
+        "Added a simple empty cockpit lining, seat, and dashboard"
+      ],
+      "bytes": 1105080,
+      "sha256": "71aeea302376ec48aca2ea179b73935c58df32112f2cdcde4c7a6df1f9d084e1",
+      "triangles": 6934,
+      "validation": {
+        "errors": 0,
+        "warnings": 0,
+        "validator": "Khronos glTF Validator"
+      }
+    },
+    {
+      "file": "stylized_x-_wing_without_r2d2.glb",
+      "derivedFrom": "stylized_x-_wing.glb",
+      "role": "Decorative chase X-wing; R2 removed, original closed canopy",
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "changes": [
+        "Removed the exposed R2 dome",
+        "Retained the original closed canopy and astromech socket"
+      ],
+      "bytes": 1093248,
+      "sha256": "72c9ce6fb467a8f75248ec2333903b1e246b63f592f028d22a72705204b325a5",
+      "triangles": 6704,
+      "validation": {
+        "errors": 0,
+        "warnings": 0,
+        "validator": "Khronos glTF Validator"
+      }
+    }
+  ],
+  "reproductionFiles": [
+    "make_xwing_variants.py",
+    "xwing-edit-selections.json"
+  ]
+}

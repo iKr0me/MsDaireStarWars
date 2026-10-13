@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#080c1b" />
+    <meta
+      name="description"
+      content="A galaxy of gentle wishes for Ms. Daire."
+    />
+    <title>For Ms. Daire · A galaxy of good wishes</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23eab7c9' d='M32 55C-12 25 12-8 32 13C52-8 76 25 32 55Z'/%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <div id="journey">
+      <main id="galaxy" data-state="idle" data-chapter="intro">
+        <div class="space-wash" aria-hidden="true"></div>
+        <div id="scene" aria-hidden="true"></div>
+
+
+        <header class="hud" id="hud">
+          <div class="collection-controls">
+            <button
+              id="collection-toggle"
+              class="collection-toggle"
+              aria-expanded="false"
+              aria-controls="collection"
+            >
+              <span class="small-heart" aria-hidden="true">♡</span
+              ><span>Notes collected <strong id="count">0</strong></span
+              ><span class="chevron" aria-hidden="true">⌄</span>
+            </button>
+<button id="write-note" class="write-note" type="button">Write a note</button>
+          </div>
+          <div class="utility"><button id="music-toggle" class="icon-button" aria-label="Play Force Theme" aria-pressed="false" title="Background music">♪</button>
+            <button
+              id="effects-toggle"
+              class="icon-button"
+              aria-label="Turn sound effects off"
+              aria-pressed="true"
+              title="Sound effects"
+            >
+              ♫</button
+            ><button
+              id="motion-toggle"
+              class="icon-button"
+              aria-label="Pause ambient motion"
+              aria-pressed="false"
+              title="Pause motion"
+            >
+              Ⅱ</button
+            ><button
+              id="credits-open"
+              class="icon-button"
+              aria-label="Open asset credits"
+              title="Credits"
+            >
+              i
+            </button>
+          </div>
+        </header>
+        <section
+          id="opening"
+          class="crawl-chapter"
+          aria-labelledby="opening-title"
+        >
+          <div class="crawl-frame">
+            <div id="opening-crawl" class="crawl-copy">
+              <h1 id="opening-title">
+                TO MS. DAIRE,<br />FROM A GALAXY<br />FAR, FAR AWAY…
+              </h1>
+
+            </div>
+          </div>
+          <div class="chapter-cue">
+            <span>Scroll to begin</span><span aria-hidden="true">↓</span>
+          </div>
+          <button id="skip-intro" class="skip-intro">
+            Skip intro <span aria-hidden="true">↗</span>
+          </button>
+        </section>
+        <section
+          id="farewell"
+          class="crawl-chapter"
+          aria-labelledby="farewell-title"
+          hidden
+        >
+          <div class="crawl-frame">
+            <div id="farewell-crawl" class="crawl-copy">
+              <h2 id="farewell-title">
+                THANK YOU,<br />WITH MUCH LOVE,<br />WE HOPE YOU<br />RECOVER
+                SOON!
+              </h2>
+            </div>
+          </div>
+        </section>
+        <div id="hyperspace" aria-hidden="true"></div>
+
+        <div class="scene-prompt">
+          <span class="prompt-star" aria-hidden="true">✧</span>
+          <p>Press R2-D2</p>
+
+        </div>
+        <button
+          id="r2-target"
+          disabled
+          aria-label="Press R2-D2 to receive a heart note"
+        >
+          <span class="target-ring" aria-hidden="true"></span
+          ><span class="target-callout" aria-hidden="true"
+            ><span class="target-line"></span>R2-D2 <span>↗</span></span
+          >
+        </button>
+
+        <footer class="scene-footer">
+          <div class="demo-controls">
+            <span id="mode-label">Loading…</span
+            ><button id="reset-demo" hidden>Reset demo</button>
+          </div>
+
+          <span class="footer-star" aria-hidden="true">✦</span>
+        </footer>
+        <button id="galaxy-scroll-cue" class="galaxy-scroll-cue" type="button">
+          <span>Scroll for a final message</span
+          ><span aria-hidden="true">↓</span>
+        </button>
+        <div id="status" class="status" role="status" aria-live="polite">
+          Preparing your galaxy…
+        </div>
+        <section
+          id="collection"
+          class="collection-panel"
+          aria-label="Your collected notes"
+          hidden
+        >
+          <div class="panel-heading">
+            <div>
+
+              <h2>Collected notes</h2>
+            </div>
+            <button
+              id="collection-close"
+              class="close-button"
+              aria-label="Close collected notes"
+            >
+              ×
+            </button>
+          </div>
+          <p class="collection-empty">Your collected notes will appear here.</p>
+          <div id="collection-grid" class="collection-grid"></div>
+          <p class="collection-footnote">Open a heart to read it again.</p>
+        </section>
+        <section
+          id="reader"
+          class="reader"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="reader-title"
+          aria-describedby="reader-message"
+          hidden
+        >
+          <div id="note-stage" class="note-stage">
+            <svg
+              class="shape-definitions"
+              width="0"
+              height="0"
+              aria-hidden="true"
+            >
+              <defs>
+                <clipPath
+                  id="open-heart-clip"
+                  clipPathUnits="objectBoundingBox"
+                >
+                  <path
+                    transform="scale(.0016666667 .0017543860)"
+                    d="M300 545C265 515 50 372 26 238C-2 85 191 7 300 139C409 7 602 85 574 238C550 372 335 515 300 545Z"
+                  />
+                </clipPath>
+              </defs>
+            </svg>
+            <article id="paper" class="paper">
+              <svg
+                class="open-heart-paper"
+                viewBox="0 0 600 570"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <defs>
+                  <linearGradient id="open-paper-gradient" x2="1" y2="1">
+                    <stop stop-color="#fffaf0" />
+                    <stop offset="1" stop-color="#f5e7da" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M300 545C265 515 50 372 26 238C-2 85 191 7 300 139C409 7 602 85 574 238C550 372 335 515 300 545Z"
+                  fill="url(#open-paper-gradient)"
+                  stroke="#edc0ce"
+                  stroke-width="11"
+                />
+                <path
+                  d="M300 526C266 497 70 363 47 234C23 105 190 35 300 157C410 35 577 105 553 234C530 363 334 497 300 526Z"
+                  fill="none"
+                  stroke="#d8b7b066"
+                  stroke-width="1.3"
+                />
+                <path
+                  d="M300 158V523"
+                  fill="none"
+                  stroke="#c8aab323"
+                  stroke-width="1"
+                />
+              </svg>
+              <div class="paper-rule" aria-hidden="true"></div>
+              <div class="letter-top">
+                <span class="eyebrow">A LITTLE NOTE, JUST FOR YOU</span
+                ><button
+                  id="reader-close"
+                  class="close-button"
+                  aria-label="Close letter"
+                >
+                  ×
+                </button>
+              </div>
+              <span class="letter-heart" aria-hidden="true">♡</span>
+              <h2 id="reader-title">Dear Ms. Daire,</h2>
+              <p id="reader-message" class="letter-message"></p>
+              <div class="signature">
+                <span>With love,</span><strong id="reader-sender"></strong>
+              </div>
+              <div class="letter-bottom">
+                <span class="letter-number" id="letter-number"></span
+                ><span>Tap to close letter</span
+                ><span aria-hidden="true">✧</span>
+              </div>
+            </article>
+            <div class="heart-cover cover-left" aria-hidden="true"></div>
+            <div class="heart-cover cover-right" aria-hidden="true"></div>
+          </div>
+        </section>
+<section id="composer" class="composer" role="dialog" aria-modal="true" aria-labelledby="composer-title" hidden>
+<form><div class="form-top"><h2 id="composer-title">Write a note</h2><button id="composer-close" class="close-button" type="button" aria-label="Close note form">×</button></div>
+<p id="submission-mode"></p><label>Your name<input name="sender" autocomplete="given-name" required placeholder="First name or nickname" /></label>
+<label>Message<div class="message-field"><textarea name="message" required aria-describedby="draft-count" placeholder="Your message to Ms. Daire"></textarea><span id="draft-count">0 / 400</span></div></label>
+<label>Your photo (optional)<input name="photo" type="file" accept="image/jpeg,image/png,image/webp" /></label><img id="photo-preview" alt="Your selected photo" hidden />
+<label class="photo-consent"><input name="consent" type="checkbox" />I have permission to share this photo publicly.</label>
+<p>Approved notes, names and photos will be visible to anyone who opens the website. Notes and photos must be approved by the organizer.</p>
+<p id="draft-status" role="status" aria-live="polite"></p><button type="submit" disabled>Send note</button></form></section>
+        <section
+          id="credits"
+          class="credits-panel"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="credits-title"
+          hidden
+        >
+          <button
+            id="credits-close"
+            class="close-button"
+            aria-label="Close credits"
+          >
+            ×</button
+          ><span class="eyebrow">CREDITS</span>
+          <h2 id="credits-title">Asset credits</h2>
+          <p>
+            A fan-made get-well experience. Model adaptations and creator
+            licenses are documented in the project’s ASSETS.md.
+          </p>
+          <ul><li><a href="https://sketchfab.com/3d-models/millennium-falcon-2c9c1cfa4b6d49eab054ef9067d14dbc" target="_blank" rel="noopener noreferrer">Millennium Falcon · GaryPhelps</a> — CC BY 4.0.</li><li><a href="https://sketchfab.com/3d-models/r2d2-starwars-fanart-0bcc8566756543d396dec37a8c425e7b" target="_blank" rel="noopener noreferrer">R2-D2 · eknightger</a> — CC BY 4.0.</li>
+            <li>
+              <a
+                href="https://sketchfab.com/3d-models/stylized-x-wing-645505dd04f9401390d942ec278fb4e0"
+                target="_blank"
+                rel="noopener noreferrer"
+                >X-wing · Alexander Günther</a
+              >
+              — CC BY 4.0. Chase variant removes R2.
+            </li>
+            <li>
+              <a
+                href="https://sketchfab.com/3d-models/planet-of-phoenix-bbe2737a863445f7bb2a6901d10b090a"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Planet Of Phoenix · ARCTIC WOLVES™</a
+              >
+              — CC BY 4.0.
+            </li>
+            <li>
+              <a
+                href="https://sketchfab.com/3d-models/death-star-star-wars-423fb92f677f4448aef407112a1fc032"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Death Star · Quiznos323</a
+              >
+              — CC BY-NC-SA 4.0.
+            </li>
+            <li>
+              <a
+                href="https://sketchfab.com/3d-models/tie-fighter-star-wars-d56bad4ed6f84b4fb51315e7fd8b20e2"
+                target="_blank"
+                rel="noopener noreferrer"
+                >TIE fighter · Quiznos323</a
+              >
+              — CC BY-NC-SA 4.0.
+            </li>
+            <li>
+              <a
+                href="https://freesound.org/people/OwlStorm/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Droid effects · OwlStorm</a
+              >
+              — CC0. Synthesized alternatives.
+            </li>
+          </ul>
+          <p class="credit-note">
+            Force Theme recording supplied by the organizer. Music starts only when enabled.
+          </p>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

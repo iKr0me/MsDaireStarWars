@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Little Hope — Get Well Soon</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Quicksand:wght@300;400;500;600&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body>
+  <!-- ========== STARFIELD CANVAS ========== -->
+  <canvas id="starfield" aria-hidden="true"></canvas>
+
+  <!-- ========== NEBULA LAYERS ========== -->
+  <div class="nebula nebula--1" aria-hidden="true"></div>
+  <div class="nebula nebula--2" aria-hidden="true"></div>
+  <div class="nebula nebula--3" aria-hidden="true"></div>
+
+  <!-- ========== CURSOR STARLIGHT ========== -->
+  <div class="cursor-glow" aria-hidden="true"></div>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="main-content" id="mainContent">
+    <!-- Header -->
+    <header class="hero">
+      <h1 class="hero__title">A little hope from a galaxy far, far away…</h1>
+      <p class="hero__subtitle">Rest, recharge, and let yourself be cared for.</p>
+      <p class="hero__recipient" id="recipientLine"></p>
+    </header>
+
+    <!-- Droids Scene -->
+    <section class="droids-scene" aria-label="R2-D2 and C-3PO keeping you company">
+      <!-- R2-D2 -->
+      <div class="droid droid--r2" id="droidR2" tabindex="0" role="img" aria-label="Chibi R2-D2. Click or tap for a reaction.">
+        <svg viewBox="0 0 160 200" class="droid__svg" xmlns="http://www.w3.org/2000/svg">
+          <!-- Legs -->
+          <rect x="50" y="170" width="22" height="24" rx="4" fill="#C0C0C0" stroke="#888" stroke-width="1.5"/>
+          <rect x="88" y="170" width="22" height="24" rx="4" fill="#C0C0C0" stroke="#888" stroke-width="1.5"/>
+          <rect x="54" y="168" width="14" height="6" rx="2" fill="#999"/>
+          <rect x="92" y="168" width="14" height="6" rx="2" fill="#999"/>
+          <!-- Foot details -->
+          <rect x="48" y="190" width="26" height="6" rx="3" fill="#888"/>
+          <rect x="86" y="190" width="26" height="6" rx="3" fill="#888"/>
+
+          <!-- Body -->
+          <rect x="38" y="100" width="84" height="72" rx="8" fill="#E8ECEF" stroke="#B0B8C0" stroke-width="2"/>
+          <!-- Body panels -->
+          <rect x="48" y="110" width="28" height="20" rx="3" fill="#4A90D9" stroke="#3570B0" stroke-width="1"/>
+          <rect x="84" y="110" width="28" height="20" rx="3" fill="#4A90D9" stroke="#3570B0" stroke-width="1"/>
+          <!-- Body vents -->
+          <rect x="52" y="138" width="20" height="4" rx="2" fill="#666"/>
+          <rect x="88" y="138" width="20" height="4" rx="2" fill="#666"/>
+          <rect x="52" y="146" width="20" height="4" rx="2" fill="#666"/>
+          <rect x="88" y="146" width="20" height="4" rx="2" fill="#666"/>
+          <!-- Body indicator lights -->
+          <circle cx="60" cy="158" r="3" fill="#FF4444" class="droid__led droid__led--red"/>
+          <circle cx="72" cy="158" r="3" fill="#44FF44" class="droid__led droid__led--green"/>
+          <circle cx="84" cy="158" r="3" fill="#4488FF" class="droid__led droid__led--blue"/>
+          <circle cx="96" cy="158" r="3" fill="#FFFF44" class="droid__led droid__led--yellow"/>
+
+          <!-- Neck -->
+          <rect x="55" y="90" width="50" height="14" rx="4" fill="#D0D4D8" stroke="#A0A8B0" stroke-width="1.5"/>
+
+          <!-- Dome head -->
+          <ellipse cx="80" cy="58" rx="48" ry="44" fill="#E8ECEF" stroke="#B0B8C0" stroke-width="2"/>
+          <!-- Dome blue panels -->
+          <path d="M42 40 Q42 20 60 18 L60 40 Z" fill="#4A90D9" stroke="#3570B0" stroke-width="1"/>
+          <path d="M100 40 Q100 20 118 18 L118 40 Z" fill="#4A90D9" stroke="#3570B0" stroke-width="1"/>
+          <rect x="44" y="42" width="16" height="10" rx="2" fill="#4A90D9" stroke="#3570B0" stroke-width="0.8"/>
+          <rect x="100" y="42" width="16" height="10" rx="2" fill="#4A90D9" stroke="#3570B0" stroke-width="0.8"/>
+          <!-- Dome silver band -->
+          <rect x="34" y="68" width="92" height="6" rx="3" fill="#C0C8D0"/>
+
+          <!-- Main eye -->
+          <circle cx="80" cy="48" r="14" fill="#1A1A2E" stroke="#333" stroke-width="2"/>
+          <circle cx="80" cy="48" r="8" fill="#222" stroke="#444" stroke-width="1"/>
+          <!-- Eye lens reflection -->
+          <circle cx="76" cy="44" r="3" fill="rgba(255,255,255,0.3)"/>
+          <!-- Eye indicator dots -->
+          <circle cx="74" cy="52" r="1.5" fill="#FF4444"/>
+          <circle cx="80" cy="54" r="1.5" fill="#4488FF"/>
+          <circle cx="86" cy="52" r="1.5" fill="#44FF44"/>
+
+          <!-- Holo-projector -->
+          <rect x="76" y="28" width="8" height="10" rx="3" fill="#666" stroke="#444" stroke-width="1"/>
+          <circle cx="80" cy="26" r="3" fill="#FF6666"/>
+
+          <!-- Chibi blush marks -->
+          <ellipse cx="58" cy="62" rx="6" ry="3" fill="rgba(255,150,150,0.4)"/>
+          <ellipse cx="102" cy="62" rx="6" ry="3" fill="rgba(255,150,150,0.4)"/>
+
+          <!-- Arms (chibi stubby) -->
+          <rect x="22" y="120" width="18" height="10" rx="5" fill="#D0D4D8" stroke="#A0A8B0" stroke-width="1.5" class="droid__arm droid__arm--left"/>
+          <rect x="120" y="120" width="18" height="10" rx="5" fill="#D0D4D8" stroke="#A0A8B0" stroke-width="1.5" class="droid__arm droid__arm--right"/>
+        </svg>
+        <div class="droid__speech" id="r2Speech" aria-live="polite"></div>
+      </div>
+
+      <!-- C-3PO -->
+      <div class="droid droid--c3po" id="droidC3PO" tabindex="0" role="img" aria-label="Chibi C-3PO. Click or tap for a reaction.">
+        <svg viewBox="0 0 160 210" class="droid__svg" xmlns="http://www.w3.org/2000/svg">
+          <!-- Legs -->
+          <rect x="52" y="170" width="20" height="34" rx="5" fill="#C8A84E" stroke="#8B7320" stroke-width="1.5"/>
+          <rect x="88" y="170" width="20" height="34" rx="5" fill="#C8A84E" stroke="#8B7320" stroke-width="1.5"/>
+          <!-- Knee joints -->
+          <circle cx="62" cy="180" r="5" fill="#D4B860" stroke="#8B7320" stroke-width="1"/>
+          <circle cx="98" cy="180" r="5" fill="#D4B860" stroke="#8B7320" stroke-width="1"/>
+          <!-- Feet -->
+          <rect x="46" y="200" width="32" height="8" rx="4" fill="#B89830" stroke="#8B7320" stroke-width="1"/>
+          <rect x="82" y="200" width="32" height="8" rx="4" fill="#B89830" stroke="#8B7320" stroke-width="1"/>
+
+          <!-- Torso -->
+          <rect x="42" y="100" width="76" height="72" rx="10" fill="#D4B860" stroke="#8B7320" stroke-width="2"/>
+          <!-- Chest plate -->
+          <rect x="52" y="110" width="56" height="30" rx="5" fill="#C8A84E" stroke="#9B8328" stroke-width="1"/>
+          <!-- Chest detail lines -->
+          <line x1="60" y1="118" x2="100" y2="118" stroke="#9B8328" stroke-width="1"/>
+          <line x1="60" y1="125" x2="100" y2="125" stroke="#9B8328" stroke-width="1"/>
+          <line x1="60" y1="132" x2="100" y2="132" stroke="#9B8328" stroke-width="1"/>
+          <!-- Torso wire detail -->
+          <circle cx="70" cy="150" r="3" fill="#444"/>
+          <circle cx="80" cy="150" r="3" fill="#444"/>
+          <circle cx="90" cy="150" r="3" fill="#444"/>
+          <!-- Belly button indicator -->
+          <circle cx="80" cy="158" r="4" fill="#FFCC00" stroke="#8B7320" stroke-width="1" class="droid__led droid__led--yellow"/>
+
+          <!-- Neck -->
+          <rect x="60" y="88" width="40" height="16" rx="5" fill="#B89830" stroke="#8B7320" stroke-width="1.5"/>
+          <!-- Neck wires -->
+          <line x1="66" y1="90" x2="66" y2="102" stroke="#555" stroke-width="1.5"/>
+          <line x1="74" y1="90" x2="74" y2="102" stroke="#555" stroke-width="1.5"/>
+          <line x1="82" y1="90" x2="82" y2="102" stroke="#555" stroke-width="1.5"/>
+          <line x1="90" y1="90" x2="90" y2="102" stroke="#555" stroke-width="1.5"/>
+
+          <!-- Head -->
+          <ellipse cx="80" cy="50" rx="42" ry="46" fill="#D4B860" stroke="#8B7320" stroke-width="2"/>
+          <!-- Forehead plate -->
+          <rect x="50" y="18" width="60" height="14" rx="4" fill="#C8A84E" stroke="#8B7320" stroke-width="1"/>
+
+          <!-- Eyes -->
+          <circle cx="66" cy="44" r="10" fill="#FFEE88" stroke="#8B7320" stroke-width="1.5"/>
+          <circle cx="94" cy="44" r="10" fill="#FFEE88" stroke="#8B7320" stroke-width="1.5"/>
+          <circle cx="66" cy="44" r="5" fill="#FFF8CC"/>
+          <circle cx="94" cy="44" r="5" fill="#FFF8CC"/>
+          <circle cx="66" cy="44" r="2.5" fill="#333"/>
+          <circle cx="94" cy="44" r="2.5" fill="#333"/>
+
+          <!-- Mouth grill -->
+          <rect x="62" y="62" width="36" height="14" rx="3" fill="#8B7320" stroke="#6B5310" stroke-width="1"/>
+          <line x1="68" y1="64" x2="68" y2="74" stroke="#6B5310" stroke-width="1"/>
+          <line x1="74" y1="64" x2="74" y2="74" stroke="#6B5310" stroke-width="1"/>
+          <line x1="80" y1="64" x2="80" y2="74" stroke="#6B5310" stroke-width="1"/>
+          <line x1="86" y1="64" x2="86" y2="74" stroke="#6B5310" stroke-width="1"/>
+          <line x1="92" y1="64" x2="92" y2="74" stroke="#6B5310" stroke-width="1"/>
+
+          <!-- Ear circles -->
+          <circle cx="36" cy="50" r="10" fill="#C8A84E" stroke="#8B7320" stroke-width="1.5"/>
+          <circle cx="36" cy="50" r="5" fill="#8B7320"/>
+          <circle cx="124" cy="50" r="10" fill="#C8A84E" stroke="#8B7320" stroke-width="1.5"/>
+          <circle cx="124" cy="50" r="5" fill="#8B7320"/>
+
+          <!-- Chibi blush marks -->
+          <ellipse cx="56" cy="58" rx="5" ry="2.5" fill="rgba(255,150,150,0.35)"/>
+          <ellipse cx="104" cy="58" rx="5" ry="2.5" fill="rgba(255,150,150,0.35)"/>
+
+          <!-- Arms -->
+          <rect x="20" y="115" width="24" height="12" rx="6" fill="#D4B860" stroke="#8B7320" stroke-width="1.5" class="droid__arm droid__arm--left"/>
+          <rect x="116" y="115" width="24" height="12" rx="6" fill="#D4B860" stroke="#8B7320" stroke-width="1.5" class="droid__arm droid__arm--right"/>
+          <!-- Hands -->
+          <circle cx="22" cy="121" r="5" fill="#C8A84E" stroke="#8B7320" stroke-width="1"/>
+          <circle cx="138" cy="121" r="5" fill="#C8A84E" stroke="#8B7320" stroke-width="1"/>
+        </svg>
+        <div class="droid__speech" id="c3poSpeech" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- Hearts Grid -->
+    <section class="hearts-section" aria-label="Paper hearts with get-well notes">
+      <div class="hearts-grid" id="heartsGrid">
+        <!-- Hearts are generated by JavaScript from CONFIG.notes -->
+      </div>
+    </section>
+
+    <!-- Extra Love Button -->
+    <section class="extra-love-section">
+      <button class="btn-extra-love" id="btnExtraLove" aria-label="Need a little extra love? Click for a comforting message.">
+        <span class="btn-extra-love__text">Need a little extra love?</span>
+        <span class="btn-extra-love__stars" aria-hidden="true"></span>
+      </button>
+      <div class="extra-love-message" id="extraLoveMessage" aria-live="polite"></div>
+    </section>
+
+    <!-- Final Surprise -->
+    <section class="final-surprise" id="finalSurprise" aria-live="polite">
+      <p class="final-surprise__text" id="finalSurpriseText"></p>
+      <div class="final-surprise__stars" aria-hidden="true"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p class="footer__text">— <span id="senderName"></span></p>
+    </footer>
+  </main>
+
+  <!-- ========== SCRIPTS ========== -->
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "music": {
+    "src": "/audio/force-theme.mp3",
+    "enabledByDefault": false,
+    "loop": true,
+    "initialVolume": 0.4,
+    "expectedFilename": "force-theme.mp3",
+    "status": "user-supplied",
+    "referenceUrl": "https://www.youtube.com/watch?v=eb2zuegwcwk",
+    "referenceTitle": "Star Wars - The Force Suite (Theme)"
+  },
+  "effects": {
+    "enabledByDefault": true,
+    "initialVolume": 0.35,
+    "selection": "alternate-per-accepted-R2-request",
+    "clips": [
+      {
+        "id": "droid-option-1",
+        "src": "/audio/droid-option-1.mp3",
+        "includedFile": "droid-option-1.mp3",
+        "description": "Synthesized retro droid chirp",
+        "creator": "OwlStorm / Ashe Kirk / Owlish Media",
+        "license": "CC0-1.0",
+        "source": "https://freesound.org/people/OwlStorm/sounds/404759/",
+        "isFilmRecording": false,
+        "formatNote": "Creator-published high-quality MP3 preview, not original WAV",
+        "bytes": 22022,
+        "sha256": "7c5feaefbdfd758daed72920c8419f4264f65a190418b6018e9bee656e483325"
+      },
+      {
+        "id": "droid-option-2",
+        "src": "/audio/droid-option-2.mp3",
+        "includedFile": "droid-option-2.mp3",
+        "description": "Synthesized droid whistle",
+        "creator": "OwlStorm / Ashe Kirk / Owlish Media",
+        "license": "CC0-1.0",
+        "source": "https://freesound.org/people/OwlStorm/sounds/404784/",
+        "isFilmRecording": false,
+        "formatNote": "Creator-published high-quality MP3 preview, not original WAV",
+        "bytes": 16648,
+        "sha256": "6231aa22ddcc60b12c84f38f3c62e5c044190a72fbffdb69525626413d79c1de"
+      }
+    ],
+    "fallbackSrc": "/audio/droid-chirp.wav"
+  },
+  "notes": [
+    "Copy only included audio files to website/public/audio. Do not attempt to load a null music src.",
+    "To use the requested music later, supply permitted force-theme.mp3 and set music.src to /audio/force-theme.mp3. Playback still begins from a user gesture.",
+    "A reference URL is never an HTML audio src. Do not extract YouTube recordings or create a hidden YouTube player."
+  ]
+}

@@ -1,0 +1,9 @@
+node_modules/
+website/dist/
+website/dist-demo/
+.env*
+!.env.example
+.DS_Store
+*.log
+
+.vercel/

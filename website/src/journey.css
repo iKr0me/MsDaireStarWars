@@ -1,0 +1,224 @@
+html {
+  scrollbar-gutter: stable;
+}
+html.scroll-locked {
+  overflow: hidden;
+}
+#journey {
+  height: 298svh;
+  position: relative;
+}
+#galaxy {
+  position: sticky;
+  top: 0;
+  min-height: 0;
+  height: 100svh;
+}
+.crawl-chapter {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+.crawl-frame {
+  position: absolute;
+  inset: 8% 0 10%;
+  perspective: 550px;
+  perspective-origin: 50% 25%;
+  display: grid;
+  place-items: center;
+}
+.crawl-copy {
+  width: min(900px, 86vw);
+  text-align: center;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+.crawl-copy h1,
+.crawl-copy h2 {
+  font-family: Arial, "Helvetica Neue", sans-serif, Arial, sans-serif;
+  font-stretch: normal;
+  font-weight: 800;
+  font-size: clamp(34px, 5.4vw, 82px);
+  line-height: 1.25;
+  letter-spacing: 0.015em;
+  color: #f4ce39;
+  margin: 28px 0;
+  text-shadow: 0 0 35px #d5a7500d;
+}
+.crawl-kicker {
+  font-size: 10px;
+  color: #bbae8d;
+  letter-spacing: 0.25em;
+}
+.crawl-whisper {
+  font:
+    italic 18px Georgia,
+    serif;
+  color: #b8ae98;
+  margin: 28px 0;
+}
+.chapter-cue {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  color: #b0aec0;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+.chapter-cue > span:last-child {
+  color: #dcc38f;
+  font-size: 17px;
+}
+.skip-intro {
+  position: absolute;
+  bottom: 11%;
+  right: 6%;
+  pointer-events: auto;
+  color: #c3b69d;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid #dcc38f30;
+  padding: 7px 0;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+.skip-intro span {
+  margin-left: 8px;
+}
+.galaxy-scroll-cue {
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #9a9aad;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  z-index: 4;
+  cursor: pointer;
+}
+.galaxy-scroll-cue > span:last-child {
+  color: #c7b894;
+}
+#hyperspace {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 6;
+}
+#galaxy:not([data-chapter="galaxy"]) .collection-toggle,
+#galaxy:not([data-chapter="galaxy"]) .dedication,
+#galaxy:not([data-chapter="galaxy"]) .scene-prompt,
+#galaxy:not([data-chapter="galaxy"]) #r2-target,
+#galaxy:not([data-chapter="galaxy"]) .planet-caption,
+#galaxy:not([data-chapter="galaxy"]) .galaxy-scroll-cue,
+#galaxy:not([data-chapter="galaxy"]) .scene-footer > p {
+  visibility: hidden;
+  pointer-events: none;
+}
+.dedication {
+  top: 12%;
+}
+.dedication h1 {
+  font-size: clamp(24px, 3vw, 43px);
+}
+.scene-prompt {
+  top: 37%;
+}
+.collection-toggle,
+.dedication,
+.scene-prompt,
+.planet-caption {
+  transition: opacity 0.25s;
+}
+.credits-panel {
+  z-index: 25;
+}
+#farewell .crawl-frame {
+  inset: 7% 0 7%;
+}
+#farewell .crawl-copy h2 {
+  font-size: clamp(32px, 5vw, 76px);
+}
+@media (max-width: 700px) {
+  .crawl-frame {
+    inset: 15% 0 12%;
+    perspective: 500px;
+  }
+  .crawl-copy h1,
+  .crawl-copy h2 {
+    font-size: clamp(28px, 6.6vw, 45px);
+    line-height: 1.4;
+    letter-spacing: 0.035em;
+  }
+  .crawl-kicker {
+    font-size: 7px;
+    letter-spacing: 0.14em;
+  }
+  .crawl-whisper {
+    font-size: 14px;
+  }
+  .chapter-cue {
+    bottom: 15%;
+  }
+  .skip-intro {
+    bottom: 16%;
+    font-size: 9px;
+  }
+  .dedication {
+    top: 18%;
+  }
+  .dedication h1 {
+    font-size: clamp(25px, 6vw, 38px);
+  }
+  .scene-prompt {
+    top: 38%;
+  }
+  .galaxy-scroll-cue {
+    bottom: 15%;
+    font-size: 8px;
+  }
+  #farewell .crawl-copy h2 {
+    font-size: clamp(29px, 7vw, 46px);
+  }
+  .collection-panel {
+    top: 116px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crawl-copy {
+    will-change: auto;
+  }
+  .crawl-frame {
+    perspective: none;
+  }
+  .crawl-copy h1,
+  .crawl-copy h2 {
+    text-shadow: none;
+  }
+}
+
+.galaxy-scroll-cue {
+  border: 0;
+  background: none;
+  padding: 10px;
+}
+
+.scene-prompt { top: 18%; }
+#farewell .crawl-frame { perspective: 900px; perspective-origin: 50% 50%; }
+/* Hide interface furniture during flight through hyperspace. */
+#galaxy[data-chapter="transition"] .hud,
+#galaxy[data-chapter="transition"] .scene-footer,
+#galaxy[data-chapter="transition"] .chapter-cue,
+#galaxy[data-chapter="transition"] .skip-intro { visibility:hidden; pointer-events:none; }

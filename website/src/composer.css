@@ -1,0 +1,40 @@
+.write-note {
+  margin-top:14px; padding:10px 18px; border:1px solid #00b9e75c;
+  background:#050b12; color:#00c9f5; border-radius:5px; font-size:12px;
+}
+#galaxy:not([data-chapter="galaxy"]) .write-note { visibility:hidden; }
+.composer {
+  position:absolute; inset:0; display:grid; place-items:center; z-index:22; pointer-events:none;
+  font-family:"Trebuchet MS",Arial,sans-serif; color:#00c9f5;
+}
+.composer form {
+  width:min(560px,90vw); max-height:84svh; overflow:auto; pointer-events:auto;
+  background:linear-gradient(145deg,#07131d,#010409 70%); color:#00c9f5;
+  border:1px solid #00b9e78c; border-radius:8px; padding:28px;
+  box-shadow:0 15px 60px #0009,inset 0 0 35px #00b9e708,0 0 24px #00b9e713;
+}
+.composer h2 { margin:0; font:700 30px "Trebuchet MS",Arial,sans-serif; color:#00c9f5; }
+.composer .form-top { display:flex; justify-content:space-between; align-items:center; }
+.composer .close-button { color:#00c9f5; border-color:#00b9e74d; background:#03101a; }
+.composer label { display:block; margin-top:18px; font-size:14px; font-weight:600; }
+.composer input:not([type=checkbox]),.composer textarea {
+  width:100%; margin-top:7px; padding:12px; color:#caefff; background:#030910;
+  border:1px solid #24768d; border-radius:4px; font:16px "Trebuchet MS",Arial,sans-serif;
+}
+.composer input:focus-visible,.composer textarea:focus-visible,.composer button:focus-visible {
+  outline:2px solid #00c9f5; outline-offset:3px;
+}
+.composer textarea { height:150px; resize:vertical; padding-bottom:28px; }
+.composer textarea::placeholder,.composer input::placeholder { color:#648b9c; }
+.composer input[type=checkbox] { accent-color:#00c9f5; }
+.message-field { position:relative; }
+#draft-count { position:absolute; right:12px; bottom:12px; font-size:11px; color:#74a0b1; }
+.composer .photo-consent { display:flex; align-items:flex-start; gap:8px; font-weight:400; }
+.composer p { font-size:12px; line-height:1.5; color:#88b3c4; }
+.composer [type=submit] {
+  display:block; margin-left:auto; padding:12px 20px; color:#00121d; font-weight:700;
+  background:#00c9f5; border:1px solid #48ddff; border-radius:4px; box-shadow:0 0 18px #00b9e73d;
+}
+.composer [type=submit]:disabled { background:#0b1d29; color:#668594; border-color:#28424f; box-shadow:none; }
+#photo-preview { width:64px; height:64px; object-fit:cover; border:1px solid #00c9f5; border-radius:6px; margin-top:10px; }
+#draft-status { color:#ffb6ac; min-height:18px; }
