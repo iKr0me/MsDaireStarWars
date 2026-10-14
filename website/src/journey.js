@@ -1,6 +1,6 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { journeyState } from "./journey-state.js";
+import { CHAPTERS, journeyState } from "./journey-state.js";
 gsap.registerPlugin(ScrollTrigger);
 export function createJourney({ scene, reduced, onChange }) {
   const shell = document.querySelector("#journey"),
@@ -20,17 +20,10 @@ export function createJourney({ scene, reduced, onChange }) {
       ease: "none",
     },
   );
-  const outro = gsap.timeline({ paused: true }).fromTo(
-    "#farewell-crawl",
-    { y: () => innerHeight * 0.42, scale: 1.05, rotationX: 58, opacity: 0 },
-    {
-      y: 0,
-      scale: 1,
-      rotationX: 22,
-      opacity: 1,
-      duration: 1,
-      ease: "none",
-    },
+  const outro = gsap.timeline({paused:true}).fromTo(
+    '#farewell-crawl',
+    {y:()=>innerHeight*.28,scale:1,rotationX:58,opacity:1},
+    {y:()=>-innerHeight*.06,scale:.82,rotationX:65,opacity:1,duration:1,ease:'none'},
   );
   let locked = false,
     lastUnits = 0,
@@ -41,8 +34,8 @@ export function createJourney({ scene, reduced, onChange }) {
     const s = journeyState(units, reduced.matches);
     lastUnits = units;
     galaxy.dataset.chapter = s.chapter;
-    opening.hidden = reduced.matches ? s.chapter !== "intro" : units >= 0.66;
-    farewell.hidden = reduced.matches ? s.chapter !== "farewell" : units < 1.49;
+    opening.hidden = reduced.matches ? s.chapter !== "intro" : units >= CHAPTERS.enterEnd;
+    farewell.hidden = reduced.matches ? s.chapter !== "farewell" : units < CHAPTERS.leaveEnd-.08;
     if (reduced.matches) {
       intro.progress(0);
       outro.progress(0);
@@ -53,7 +46,7 @@ export function createJourney({ scene, reduced, onChange }) {
       outro.progress(s.farewell, true);
     }
     warp.style.opacity = String(s.warp * 0.94);
-    scene?.setJourney({ visible: s.sceneVisible, warp: s.warp, starZoom:s.starZoom });
+    scene?.setJourney({ visible: s.sceneVisible, warp: s.warp, starZoom:s.starZoom, sceneScale:s.sceneScale });
     if (current !== s.chapter) {
       current = s.chapter;
       onChange(s.chapter);
@@ -64,21 +57,13 @@ export function createJourney({ scene, reduced, onChange }) {
     start: "top top",
     end: () => `+=${shell.offsetHeight - galaxy.offsetHeight}`,
     invalidateOnRefresh: true,
-    onUpdate: (self) => view(self.progress * 1.98),
+    onUpdate: (self) => view(self.progress * CHAPTERS.end),
     onRefresh: (self) => {
       intro.invalidate();
       outro.invalidate();
-      view(self.progress * 1.98);
+      view(self.progress * CHAPTERS.end);
     },
   });
-  const jump = () => {
-    if (locked) return;
-    window.scrollTo({
-      top: (shell.offsetHeight - galaxy.offsetHeight) * (0.85 / 1.98),
-      behavior: reduced.matches ? "instant" : "smooth",
-    });
-  };
-  document.querySelector("#skip-intro").addEventListener("click", jump);
   document.querySelector("#galaxy-scroll-cue").addEventListener("click", () => {
     if (!locked)
       window.scrollTo({
@@ -104,7 +89,7 @@ export function createJourney({ scene, reduced, onChange }) {
         cancelAnimationFrame(scrollFrame);
         scrollFrame = requestAnimationFrame(() => {
           ScrollTrigger.update();
-          view(trigger.progress * 1.98);
+          view(trigger.progress * CHAPTERS.end);
         });
       }
     },

@@ -1,0 +1,8 @@
+.audio-welcome { position:fixed; inset:0; z-index:60; display:grid; place-items:center; background:#01050ccc; padding:20px; font-family:"Trebuchet MS",Arial,sans-serif; }
+.audio-welcome-panel { width:min(440px,92vw); padding:30px; border:1px solid #00c9f588; border-radius:8px; background:#06101af2; color:#00c9f5; box-shadow:0 0 40px #00c9f518; }
+.audio-welcome h2 { margin:0 0 14px; font-size:28px; }
+.audio-welcome p { color:#a0c9db; line-height:1.5; }
+.audio-welcome-actions { display:flex; gap:14px; justify-content:flex-end; margin-top:26px; }
+.audio-welcome button { padding:11px 21px; border:1px solid #00c9f5; border-radius:4px; color:#00c9f5; background:transparent; }
+#audio-turn-on { background:#00c9f5; color:#00131d; font-weight:700; box-shadow:0 0 18px #00c9f544; }
+.audio-welcome button:focus-visible { outline:2px solid #81eaff;outline-offset:4px; }

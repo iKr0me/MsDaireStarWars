@@ -55,3 +55,13 @@
 - [x] Occasional independent head wandering and viewer glances.
 - [x] Tests and local production/demo builds.
 - [ ] New visual confirmation from screenshots; changes pushed/deployed through user accounts.
+
+## Latest requested polish
+- [x] Remove note eyebrow, With love salutation and Skip intro.
+- [x] First-load audio choice with two cyan buttons and gesture-started playback.
+- [x] Longer five-stage warp, progressive streak density/length, earlier initial zoom.
+- [x] Matching steep upward farewell crawl with bounded final position.
+- [x] Fixed-rate head turns, primarily forward-facing, with wandering/flyby glances.
+- [x] Blur only inside the form panel; whole-panel orb compaction.
+- [x] Drawn Falcon course, upright bank, later acceleration and wider rear engine glow/trail.
+- [ ] User visual confirmation of the new choreography and engine placement.

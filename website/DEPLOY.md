@@ -23,7 +23,7 @@ Use GitHub Desktop or Git rather than the GitHub browser’s Upload files page: 
    - Output directory: `dist-demo`
 4. Node.js version: **24.x**, also pinned in `website/package.json`.
 5. Leave environment variables empty for the demo and click **Deploy**.
-6. Open the returned URL. Check the intro, both hyperspace transitions, R2 press, pink heart flight, text fade, close/collection, music button, farewell and scrolling back up. Check once on a phone, too. Music starts after pressing its control, as required by browsers.
+6. Open the returned URL and choose Turn on or Keep off in the audio prompt. Check the intro, both hyperspace transitions, R2 press, pink heart flight, text fade, close/collection, music button, farewell and scrolling back up. Check once on a phone, too. Music starts after pressing its control, as required by browsers.
 
 [Vite on Vercel](https://vercel.com/docs/frameworks/frontend/vite), [Node.js versions](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions).
 

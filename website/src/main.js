@@ -1,3 +1,4 @@
+import { createAudioWelcome } from "./audio-welcome.js";
 import { createComposer } from "./composer.js";
 import "./styles.css";
 import "./journey.css";
@@ -31,8 +32,14 @@ let notes = await adapter.list(),
   composer,
   journey,
   paused = false,
+  audioGateActive = true,
   panelWasOpen = false,
   previousFocus = null;
+createAudioWelcome({audio,onClose({musicFailed}){
+  audioGateActive=false; soundUI();musicUI();syncScrollLock();
+  if(musicFailed)status('Music could not start. Try the music control.',4000);
+  $('motion-toggle').focus({preventScroll:true});
+}});
 let statusTimer;
 function status(message, timeout = 0) {
   clearTimeout(statusTimer);
@@ -48,7 +55,7 @@ $("mode-label").textContent =
     : "Preview — notes not connected";
 $("reset-demo").hidden = adapter.mode !== "demo";
 function syncScrollLock() {
-  journey?.setLocked(notebook.busy || composer?.active || !panel.hidden || !$("credits").hidden);
+  journey?.setLocked(audioGateActive || notebook.busy || composer?.active || !panel.hidden || !$("credits").hidden);
 }
 function stateChanged(state) {
   galaxy.dataset.state = state;
@@ -175,12 +182,13 @@ function soundUI() {
   );
   button.textContent = audio.enabled ? "♫" : "♩";
 }
-$("music-toggle").addEventListener("click", async () => {
-  const enabled = await audio.toggleMusic();
-  $("music-toggle").setAttribute("aria-pressed", String(enabled));
-  $("music-toggle").setAttribute("aria-label", enabled ? "Pause Force Theme" : "Play Force Theme");
-  $("music-toggle").textContent = enabled ? "♫" : "♪";
-});
+function musicUI(){
+  const enabled=audio.musicEnabled;
+  $("music-toggle").setAttribute("aria-pressed",String(enabled));
+  $("music-toggle").setAttribute("aria-label",enabled?"Pause Force Theme":"Play Force Theme");
+  $("music-toggle").textContent=enabled?"♫":"♪";
+}
+$("music-toggle").addEventListener("click",async()=>{await audio.toggleMusic();musicUI();});
 soundUI();
 $("effects-toggle").addEventListener("click", () => {
   audio.toggle();

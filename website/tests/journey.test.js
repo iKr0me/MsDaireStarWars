@@ -1,46 +1,26 @@
-import test from "node:test";
-import assert from "node:assert/strict";
-import { journeyState } from "../src/journey-state.js";
-test("chapters follow scroll position and reverse exactly without accumulated state", () => {
-  const steps = [0, 0.3, 0.7, 0.85, 1, 1.3, 2.5, 3.1, 3.24, 3.4, 3.6, 4.5];
-  const forward = steps.map((x) => journeyState(x));
-  const reverse = [...steps]
-    .reverse()
-    .map((x) => journeyState(x))
-    .reverse();
-  assert.deepEqual(reverse, forward);
-  assert.equal(forward[0].chapter, "intro");
-  assert.equal(journeyState(1).chapter, "galaxy");
-  assert.equal(forward.at(-1).chapter, "farewell");
-  assert.equal(journeyState(0.51).sceneVisible, false);
-  assert.equal(journeyState(1).sceneVisible, true);
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {CHAPTERS as C,journeyState} from '../src/journey-state.js';
+const at=(p,start=C.enterStart,end=C.enterEnd)=>journeyState(start+p*(end-start));
+test('chapters reverse without accumulated state and final scroll stops at farewell',()=>{
+ const steps=[0,.3,.6,1,1.2,1.6,1.95,2.4,2.85,3.65];
+ assert.deepEqual(steps.map(x=>journeyState(x)),[...steps].reverse().map(x=>journeyState(x)).reverse());
+ assert.equal(journeyState(0).chapter,'intro');assert.equal(journeyState(1.6).chapter,'galaxy');assert.equal(journeyState(C.end).chapter,'farewell');
+ assert.equal(at(.1).sceneVisible,false);assert.equal(at(.9).sceneVisible,true);
 });
-test("warp peaks at crossings and disappears in the reading scene; reduced motion never streaks", () => {
-  assert.ok(journeyState(0.52).warp > 0.99);
-  assert.ok(journeyState(1.49).warp > 0.99);
-  for (const n of [0, 0.85, 1.2, 1.8, 1.98])
-    assert.equal(journeyState(n).warp, 0);
-  for (const n of [0.7, 0.86, 1, 3.1, 3.24, 3.4])
-    assert.equal(journeyState(n, true).warp, 0);
+test('five warp stages increase count/length before slowing and settling',()=>{
+ assert.equal(at(.1).warp,0);assert.ok(at(.1).starZoom>1);
+ assert.ok(at(.35).warp>0 && at(.35).warp<at(.55).warp);
+ assert.ok(at(.6).warp>.99);assert.ok(at(.7).warp<at(.6).warp);
+ assert.equal(at(.9).warp,0);assert.ok(at(.9).starZoom<at(.6).starZoom);
+ assert.ok(at(.9).sceneScale<1);assert.equal(at(1).sceneScale,1);
+ for(const p of [.1,.35,.55,.6,.7,.9])assert.ok(Math.abs(at(p).warp-at(p,C.leaveStart,C.leaveEnd).warp)<1e-10);
 });
-
-test("reduced motion keeps a readable static chapter throughout both crossings", () => {
-  assert.equal(journeyState(0.5, true).chapter, "intro");
-  assert.equal(journeyState(0.85, true).chapter, "galaxy");
-  assert.equal(journeyState(1.4, true).chapter, "galaxy");
-  assert.equal(journeyState(1.7, true).chapter, "farewell");
-  for (const n of [0.9, 1.3, 3.1, 3.3])
-    assert.notEqual(journeyState(n, true).chapter, "transition");
+test('both crossings stay static and readable with reduced motion',()=>{
+ for(const x of [0,.5,1,1.6,2.1,2.6,3.2]){
+  const state=journeyState(x,true);assert.notEqual(state.chapter,'transition');assert.equal(state.warp,0);assert.equal(state.starZoom,1);assert.equal(state.sceneScale,1);
+ }
 });
-
-test("starfield pushes in before streaks and settles out after them", () => {
-  const before=journeyState(.415), peak=journeyState(.52), after=journeyState(.625);
-  assert.equal(before.warp,0);
-  assert.ok(before.starZoom>1);
-  assert.ok(peak.warp>.99);
-  assert.ok(peak.starZoom>before.starZoom);
-  assert.equal(after.warp,0);
-  assert.ok(after.starZoom>1 && after.starZoom<peak.starZoom);
-  assert.equal(journeyState(.66).starZoom,1);
-  assert.equal(journeyState(.52,true).starZoom,1);
+test('star push begins while opening text is still crawling',()=>{
+ const s=at(.1);assert.ok(s.intro<1);assert.ok(s.starZoom>1);assert.equal(s.warp,0);
 });

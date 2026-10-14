@@ -81,9 +81,6 @@
           <div class="chapter-cue">
             <span>Scroll to begin</span><span aria-hidden="true">↓</span>
           </div>
-          <button id="skip-intro" class="skip-intro">
-            Skip intro <span aria-hidden="true">↗</span>
-          </button>
         </section>
         <section
           id="farewell"
@@ -218,8 +215,7 @@
               </svg>
               <div class="paper-rule" aria-hidden="true"></div>
               <div class="letter-top">
-                <span class="eyebrow">A LITTLE NOTE, JUST FOR YOU</span
-                ><button
+                <button
                   id="reader-close"
                   class="close-button"
                   aria-label="Close letter"
@@ -231,7 +227,7 @@
               <h2 id="reader-title">Dear Ms. Daire,</h2>
               <p id="reader-message" class="letter-message"></p>
               <div class="signature">
-                <span>With love,</span><strong id="reader-sender"></strong>
+                <strong id="reader-sender"></strong>
               </div>
               <div class="letter-bottom">
                 <span class="letter-number" id="letter-number"></span
@@ -324,6 +320,11 @@
         </section>
       </main>
     </div>
+    <section id="audio-welcome" class="audio-welcome" role="dialog" aria-modal="true" aria-labelledby="audio-welcome-title">
+      <div class="audio-welcome-panel"><h2 id="audio-welcome-title">Turn on your volume</h2>
+      <p>Enable sound for the best experience.</p><div class="audio-welcome-actions">
+      <button id="audio-keep-off" type="button">Keep off</button><button id="audio-turn-on" type="button">Turn on</button>
+      </div></div></section>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

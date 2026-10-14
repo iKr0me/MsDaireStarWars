@@ -71,7 +71,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
   scene.add(camera);
   // Individually scattered tapered ribbons avoid the polar shader's aliasing grid.
   const streakPositions=[], streakSeeds=[], streakAngles=[], streakSpeeds=[];
-  for (let i=0;i<820;i++) {
+  for (let i=0;i<1100;i++) {
     const angle=random()*Math.PI*2, seed=random(), speed=.22+random()*.2;
     for(const [side,end] of [[-1,0],[1,1],[1,0],[-1,0],[-1,1],[1,1]]) {
       streakPositions.push(side,end,0); streakSeeds.push(seed);
@@ -92,7 +92,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
       void main(){
         float progress=fract(seed+time*speed);
         float radius=.065+pow(progress,2.)*1.5;
-        float length=(.003+pow(progress,3.)*.56)*strength;
+        float length=(.003+pow(progress,3.)*.78)*strength;
         vec2 direction=vec2(cos(angle),sin(angle));
         vec2 normal=vec2(-direction.y,direction.x);
         float width=.0006+pow(progress,2.)*.005;
@@ -101,6 +101,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
         gl_Position=vec4(p*2.,0.,1.);
         side=position.x;end=position.y;
         fade=smoothstep(0.,.07,progress)*(1.-smoothstep(.92,1.,progress));
+        fade*=1.-smoothstep(strength-.04,strength+.04,seed);
       }`,
     fragmentShader:`uniform float strength;varying float side;varying float end;varying float fade;
       void main(){
@@ -256,10 +257,17 @@ export async function createScene({ container, target, reduced, onStatus }) {
       );
     }
     if (headPivot && !paused && !reduced.matches) {
-      const phase = elapsed % 28;
-      const lookingAtViewer = phase > 14 && phase < 21;
-      const desired = lookingAtViewer ? THREE.MathUtils.clamp(-hero.rotation.y,-1.1,1.1) : Math.sin(elapsed*.24)*.5;
-      headYaw += (desired-headYaw)*(1-Math.exp(-dt*1.4));
+      const phase = elapsed % 32;
+      const wander = phase>24 && phase<29 ? .65 : 0;
+      let desired = -hero.rotation.y + wander;
+      if (fleet.visible && ties.length) {
+        const headWorld=headPivot.getWorldPosition(new THREE.Vector3());
+        const direction=ties[0].position.clone().sub(headWorld);
+        desired=Math.atan2(direction.x,direction.z)-hero.rotation.y;
+      }
+      const delta=THREE.MathUtils.euclideanModulo(desired-headYaw+Math.PI,Math.PI*2)-Math.PI;
+      const step=.8*dt;
+      headYaw+=Math.sign(delta)*Math.min(Math.abs(delta),step);
       headPivot.rotation.y = headYaw;
     }
     if (!paused && !reduced.matches) {
@@ -460,12 +468,26 @@ export async function createScene({ container, target, reduced, onStatus }) {
     const pickupPoint=worldAt(pickup.x/width*2-1,1-pickup.y/height*2,20);
     const approach=new THREE.CubicBezierCurve3(worldAt(1.7,-.1,15),worldAt(.9,.03,16),
       pickupPoint.clone().add(new THREE.Vector3(3,0,0)),pickupPoint);
-    const departure=new THREE.CatmullRomCurve3([pickupPoint,worldAt(-1.08,.05,42),
-      worldAt(-1.12,.36,75),worldAt(.25,.55,155),worldAt(1.5,.65,300)],false,'centripetal');
+    // Follow the supplied drawing: left sweep, broad right bend, upper-left departure.
+    const departure=new THREE.CatmullRomCurve3([
+      pickupPoint,worldAt(-.45,.04,30),worldAt(-.66,.25,42),worldAt(-.66,.60,65),
+      worldAt(-.40,.56,85),worldAt(.03,.40,125),worldAt(.26,.37,170),
+      worldAt(.26,.54,215),worldAt(-.12,.76,285),worldAt(-.24,.95,360),
+    ],false,'centripetal');
+    const enginePoints=Array.from({length:17},(_,i)=>{
+      const x=-2.2+i/16*4.4;
+      return new THREE.Vector3(x,.08,-1.6-Math.sqrt(6.25-x*x)*.55);
+    });
+    const engineCurve=new THREE.CatmullRomCurve3(enginePoints);
+    const engineGeometry=new THREE.TubeGeometry(engineCurve,32,.09,8,false);
+    const engineGlowGeometry=new THREE.TubeGeometry(engineCurve,32,.21,8,false);
+    const engineMaterial=new THREE.MeshBasicMaterial({color:0x6eeaff,toneMapped:false});
+    const engineGlowMaterial=new THREE.MeshBasicMaterial({color:0x00c9f5,transparent:true,opacity:.3,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});
+    model.add(new THREE.Mesh(engineGeometry,engineMaterial),new THREE.Mesh(engineGlowGeometry,engineGlowMaterial));
     const trailSize=90, trailSegments=[];
-    const coreGeometry=new THREE.CylinderGeometry(.045,.045,1,6);
-    const glowGeometry=new THREE.CylinderGeometry(.16,.16,1,6);
-    const coreMaterial=new THREE.MeshBasicMaterial({color:0x68dfff,transparent:true,opacity:.85,
+    const coreGeometry=new THREE.BoxGeometry(1,1,1);
+    const glowGeometry=new THREE.BoxGeometry(1.15,1,1.8);
+    const coreMaterial=new THREE.MeshBasicMaterial({color:0x68dfff,transparent:true,opacity:.45,
       blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});
     const glowMaterial=new THREE.MeshBasicMaterial({color:0x00a8ec,transparent:true,opacity:.18,
       blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});
@@ -477,15 +499,24 @@ export async function createScene({ container, target, reduced, onStatus }) {
     let trailIndex=0, previousTail;
     try {
       await new Promise(resolve=>{
-        let time=0, prev=performance.now(), passed=false;
+        let time=0, prev=performance.now(), passed=false, bank=0;
         function frame(now){
-          if(!document.hidden)time+=Math.min((now-prev)/1000,.05);prev=now;
+          const dt=Math.min((now-prev)/1000,.05);
+          if(!document.hidden)time+=dt;prev=now;
           const approaching=time<1.8;
-          const t=approaching ? Math.min(1,time/1.8) : Math.min(1,(time-1.8)/5.6);
+          const q=approaching ? Math.min(1,time/1.8) : Math.min(1,(time-1.8)/5.6);
+          const t=approaching?q:.5*q+.5*Math.pow(Math.max(0,(q-.4)/.6),2);
           const curve=approaching ? approach : departure;
-          model.position.copy(curve.getPoint(t));
-          model.quaternion.setFromUnitVectors(forward,curve.getTangent(t).normalize());
-          model.rotateZ(approaching ? -Math.sin(t*Math.PI)*.15 : -Math.sin(t*Math.PI*1.4)*.75);
+          model.position.copy(curve.getPointAt(t));
+          const heading=curve.getTangentAt(t).normalize();
+          const right=new THREE.Vector3().crossVectors(new THREE.Vector3(0,1,0),heading).normalize();
+          const up=new THREE.Vector3().crossVectors(heading,right).normalize();
+          model.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(right,up,heading));
+          const nextHeading=curve.getTangentAt(Math.min(1,t+.015)).normalize();
+          const turn=new THREE.Vector3().crossVectors(heading,nextHeading).y;
+          const targetBank=THREE.MathUtils.clamp(-turn*8,-.45,.45);
+          bank+=(targetBank-bank)*(1-Math.exp(-dt*3));
+          model.rotateZ(bank);
           model.visible=time<7.4;
           model.updateMatrixWorld(true);
           const tail=model.localToWorld(new THREE.Vector3(0,0,-2.8));
@@ -500,7 +531,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
               direction.copy(segment.b).sub(segment.a);
               dummy.position.copy(segment.a).add(segment.b).multiplyScalar(.5);
               dummy.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),direction.clone().normalize());
-              dummy.scale.set(1,Math.max(.001,direction.length()),1);
+              dummy.scale.set(4.4*(1-age*.65),Math.max(.001,direction.length()),.12);
               fadeColor.setRGB(1-age,1-age,1-age);
             } else {dummy.scale.setScalar(0);fadeColor.setRGB(0,0,0);}
             dummy.updateMatrix();
@@ -517,7 +548,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
         requestAnimationFrame(frame);
       });
     } finally {
-      canvas.remove();coreGeometry.dispose();glowGeometry.dispose();coreMaterial.dispose();glowMaterial.dispose();
+      canvas.remove();engineGeometry.dispose();engineGlowGeometry.dispose();engineMaterial.dispose();engineGlowMaterial.dispose();coreGeometry.dispose();glowGeometry.dispose();coreMaterial.dispose();glowMaterial.dispose();
       deliveryRenderer.dispose();deliveryRenderer.forceContextLoss();
     }
   }
@@ -525,9 +556,10 @@ export async function createScene({ container, target, reduced, onStatus }) {
   return {
     flyDelivery,
     signalNote() { flashStarted = performance.now(); },
-    setJourney({ visible, warp, starZoom = 1 }) {
+    setJourney({ visible, warp, starZoom = 1, sceneScale = 1 }) {
       chapterVisible = visible;
       content.visible = visible;
+      content.scale.set(sceneScale,sceneScale,1);
       stars.scale.set(starZoom,starZoom,1);
       const amount = reduced.matches ? 0 : warp;
       tunnelBackdrop.visible = amount > 0.01;

@@ -59,3 +59,5 @@
 .collection-panel .collection-empty,.collection-panel .collection-footnote { color:#88b3c4; border-color:#24768d; }
 #galaxy .collection-toggle { border-color:#00b9e760; background:#06121dbb; color:#a9e8fa; font-family:"Trebuchet MS",Arial,sans-serif; }
 #galaxy .collection-toggle strong,#galaxy .collection-toggle .small-heart,#galaxy .collection-toggle .chevron { color:#00c9f5; }
+
+.composer form { backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
