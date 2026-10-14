@@ -80,3 +80,12 @@
 - [x] Joined Falcon timing/heading through pickup; progressive acceleration after turn.
 - [x] 15 automated checks, two builds and finite/camera-visible flight smoke check.
 - [ ] User recording to confirm the new visual pacing.
+
+## October 14 flight path and warp refinement
+- [x] Replace the waypoint-heavy Falcon route with three continuous, broad screen-space curves and increasing depth.
+- [x] Accelerate from launch and add a stronger, smooth surge after the second bend.
+- [x] Replace box trail segments with a longer, transparent ribbon matching the rear engine width and angle.
+- [x] Start both streak sequences alongside the star push-in; lengthen and strengthen blue-white streaks with only a faint blue glow.
+- [x] Reduce second-transition R2 enlargement, lengthen both crossings, and start the farewell crawl lower.
+- [x] Production and demo builds.
+- [ ] User GPU/browser visual review; browser remains blocked by the saved permission setting.

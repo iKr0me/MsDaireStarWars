@@ -17,7 +17,7 @@ The development server uses the isolated demo adapter. Six invented notes are ma
 
 ## What to try
 
-1. Scroll through the opening crawl and hyperspace, or choose Skip intro. Press R2’s highlighted target in the galaxy. A short included droid effect plays and a folded paper heart travels from the ship’s current note anchor.
+1. Scroll through the opening crawl and hyperspace. Press R2’s highlighted target in the galaxy. A short included droid effect plays and a paper heart travels from the droid’s current note anchor.
 2. Press again during flight, opening, reading, closing, or departure. These presses do nothing.
 3. Read the message and close it with the close button, Escape, or a stationary tap on the paper. Selecting message text does not close it.
 4. Wait for the heart to depart. The collected count increases only for a new note.
@@ -80,7 +80,7 @@ Builds and automated state/validation tests pass. Browser verification remains u
 
 ## Latest screenshot revisions
 
-Hyperspace now renders 820 independently randomized tapered ribbons with white cores, blue glow and a dark central opening; the previous polar-pattern shader and line overlay were removed. HUD and chapter prompts hide during the crossing. The composer now uses black/navy panels, cyan accents and a local Trebuchet/Arial humanist sans stack following the cyan title-card reference. This is an approximate font match without a supplied font file.
+Hyperspace renders independently randomized tapered ribbons with white cores, blue glow and a dark central opening; the previous polar-pattern shader and line overlay were removed. HUD and chapter prompts hide during the crossing. The composer uses black/navy panels, cyan accents and a local Trebuchet/Arial humanist sans stack following the cyan title-card reference. This is an approximate font match without a supplied font file.
 
 Chase X-wing span is 1.6 world units and TIE span is 0.85 (Death Star span is 3), with the path receding to 260 units. Paired lasers are spaced at least 1.35 seconds apart and limited to the middle of a flyby. Phoenix rotates at 0.012 radians/sec (about nine minutes per full turn). R2 bobs with a 15-second period and 0.7-unit amplitude. Pause and reduced-motion settings stop this motion. New visual confirmation remains pending.
 
@@ -96,7 +96,7 @@ The heart now remains solid during flight and reveals its text on arrival withou
 
 Hyperspace now separates an initial eased starfield push-in from the bright streak window, followed by a zoom-out into the next chapter. Reversing the scroll reverses those stages. Streak length increased slightly again. The journey state test checks that stars zoom before streaks and settle after them.
 
-The composer has a translucent dark backdrop that intercepts clicks without blurring the galaxy. Collection controls and gallery now share its cyan sans-serif design. A valid demo preview collapses the form into a glowing plasma orb; the Falcon crosses that exact screen position before the orb disappears. It banks to the left and returns toward the right while receding along a longer 7.4-second route. Engine-trail segments fade over one second, with the final trail allowed to clear before input unlocks. Motion pause and reduced motion skip the pickup choreography. Actual shared submission remains unconnected.
+The composer has a translucent dark backdrop that intercepts clicks without blurring the galaxy. Collection controls and gallery now share its cyan sans-serif design. A valid demo preview collapses the form into a glowing plasma orb; the Falcon crosses that exact screen position before the orb disappears. It banks to the left and returns toward the right while receding. Motion pause and reduced motion skip the pickup choreography. Actual shared submission remains unconnected.
 
 R2’s head and eye meshes have a separate pivot preserving their source transforms; occasional smooth glances compensate for body orientation to face the viewer, interspersed with wandering turns. The light and note-origin marker follow that head pivot; the click target remains on the body. Visual confirmation of the new choreography remains pending screenshots.
 
@@ -104,11 +104,11 @@ R2’s head and eye meshes have a separate pivot preserving their source transfo
 
 A first-load audio dialog offers Keep off (outlined cyan, left) and Turn on (filled cyan, right). It locks the page until a choice, and music starts only from the Turn on gesture. Music and effects can still be controlled afterward. The note eyebrow, With love salutation and Skip intro button were removed.
 
-Both transitions have 0.9 viewport units of scroll travel, split into star zoom-in, sparse streak buildup, dense long streaks, deceleration, and star zoom-out. Intro zoom starts while the crawl is still visible near the top quarter. Scene 2 eases from a smaller presentation to normal during arrival. Farewell now moves up and recedes on the same steep crawl plane as the opening while stopping at a readable final composition. Reversal and reduced-motion behavior remain supported.
+Both transitions have 1.15 viewport units of scroll travel, split into star zoom-in, sparse streak buildup, dense long streaks, deceleration, and star zoom-out. Intro zoom starts while the crawl is still visible near the top quarter. Scene 2 eases from a smaller presentation to normal during arrival. Farewell moves up and recedes on the same steep crawl plane as the opening while stopping at a readable final composition. Reversal and reduced-motion behavior remain supported.
 
 R2’s head uses a fixed angular step rate (0.8 radians/sec), facing generally forward most of the time, occasionally glancing aside, or looking toward active flyby craft before returning forward. The composer only blurs through its own translucent panel; there is no full-screen blur. It contracts as a whole into the pickup orb.
 
-The Falcon path follows the supplied drawing: pickup from the right, up-left sweep, broad bend to the right, and final upper-left climb deep into space. Arc-length sampling avoids uneven curve speed. Speed rises after the first major bend. A world-up orientation with bank limited to about 26 degrees prevents upside-down flips. A full-width rear engine arc glows cyan and feeds a wider one-second-decaying trail. Geometry/framing of this new engine glow still needs visual confirmation. The private annotated source screenshot remains in Downloads and is not copied into the publishable repository.
+The Falcon path follows the supplied drawing: pickup from the right, up-left sweep, broad bend to the right, and final upper-left climb deep into space. A world-up orientation with bank limited to about 26 degrees prevents upside-down flips. The private annotated source screenshot remains in Downloads and is not copied into the publishable repository.
 
 ## Falcon visibility and transition correction
 
@@ -118,6 +118,14 @@ The blue hyperspace backdrop shader was removed completely. White streak widths 
 
 ## Overlapping transition stages and continuous Falcon timing
 
-Sparse streaks now begin at 4% of each crossing while star push-in continues to 24%. Streaks peak at 58% and fade until 98%; star zoom-out starts at 64%. Incoming scene models or farewell text begin fading at 60%, under the declining streaks. Scene 2 remains enlarged while its materials fade away, so there is no visible scale reset before streak buildup. Material opacity/depth-write settings are restored on arrival and support reverse scrolling.
+Streaks begin alongside the star push-in and peak near 55% of each crossing before fading under the incoming scene. Scene 2’s materials fade away without a visible scale reset. Material opacity/depth-write settings are restored on arrival and support reverse scrolling.
 
-Falcon approach/departure tangents are matched at pickup, and both use a joined route with high-resolution arc-length sampling. World-distance timing removes the previous speed jump between separately timed sections. Acceleration ramps continuously after the first major turn; orientation interpolates between upright banked headings. Two new checks cover overlap/scale continuity and monotonic post-turn speed. All 15 checks and both builds pass. A supplied-geometry CPU flight run finished with one pickup and 471 camera-visible frames (not GPU image verification).
+Falcon approach/departure tangents are matched at pickup. Earlier timing used a joined route and gradual acceleration after the first major turn; the October 14 update below supersedes that timing and route.
+
+## October 14 flight and hyperspace refinement
+
+The Falcon now follows three broad connected curves: it sweeps left and upward, bends back to the right, then climbs toward the upper-left as it recedes. The curve is defined in screen space with continuously increasing depth, so the turns stay rounded and the ship shrinks more clearly. It accelerates from launch and gains a stronger speed increase after the second bend. Its blue trail is a soft, transparent ribbon sampled across the actual width of the rear engine section; it remains for 1.7 seconds as the ship departs.
+
+Both hyperspace sequences now start forming streaks with the first part of the star zoom, use 1,900 scattered ribbons with longer blue-white cores and a slight blue edge glow, and blend the incoming scene under the slowing streaks. The second sequence keeps R2 closer to its normal size while it fades away. Both crossings have more scroll travel. The farewell crawl begins lower, with the extra scroll distance carrying the same perspective crawl through its final line.
+
+Production and demo builds pass after these changes. The browser preview remains unavailable under the saved browser permission setting, so the new visuals still need review from the user’s browser or a screenshot. The generated asset samples and trail geometry have not been visually checked on a GPU.

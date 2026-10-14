@@ -72,7 +72,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
   scene.add(camera);
   // Individually scattered tapered ribbons avoid the polar shader's aliasing grid.
   const streakPositions=[], streakSeeds=[], streakAngles=[], streakSpeeds=[];
-  for (let i=0;i<1100;i++) {
+  for (let i=0;i<1900;i++) {
     const angle=random()*Math.PI*2, seed=random(), speed=.22+random()*.2;
     for(const [side,end] of [[-1,0],[1,1],[1,0],[-1,0],[-1,1],[1,1]]) {
       streakPositions.push(side,end,0); streakSeeds.push(seed);
@@ -92,11 +92,11 @@ export async function createScene({ container, target, reduced, onStatus }) {
       varying float side; varying float end; varying float fade;
       void main(){
         float progress=fract(seed+time*speed);
-        float radius=.065+pow(progress,2.)*1.5;
-        float length=(.003+pow(progress,3.)*.78)*strength;
+        float radius=.065+pow(progress,2.)*1.65;
+        float length=(.003+pow(progress,3.)*.92)*strength;
         vec2 direction=vec2(cos(angle),sin(angle));
         vec2 normal=vec2(-direction.y,direction.x);
-        float width=(.0006+pow(progress,2.)*.005)*(1.+strength*strength*2.2);
+        float width=(.0007+pow(progress,2.)*.006)*(1.+strength*strength*2.5);
         vec2 p=direction*(radius+position.y*length)+normal*position.x*width;
         p.x/=aspect;
         gl_Position=vec4(p*2.,0.,1.);
@@ -109,8 +109,8 @@ export async function createScene({ container, target, reduced, onStatus }) {
         float glow=exp(-side*side*5.);
         float core=1.-smoothstep(.12,.45,abs(side));
         float taper=smoothstep(0.,.16,end)*(1.-smoothstep(.86,1.,end));
-        vec3 color=vec3(.1,.36,.65)*glow*.5+vec3(.95,.98,1.)*core*(1.+strength*.7);
-        gl_FragColor=vec4(color,strength*fade*taper*max(glow*.65,core));
+        vec3 color=vec3(.20,.48,.82)*glow*.58+vec3(.78,.90,1.)*core*(1.+strength*.8);
+        gl_FragColor=vec4(color,strength*fade*taper*max(glow*.78,core));
       }`,
   });
   const tunnel=new THREE.Mesh(tunnelGeometry,tunnelMaterial);
@@ -186,9 +186,9 @@ export async function createScene({ container, target, reduced, onStatus }) {
       depth: world.clone().applyMatrix4(camera.matrixWorldInverse).z,
     };
   }
-  function worldAt(x, y, distance) {
+  function worldAt(x, y, distance, target = new THREE.Vector3()) {
     ray.set(x, y, 0.5).unproject(camera).sub(camera.position).normalize();
-    return camera.position.clone().addScaledVector(ray, distance);
+    return target.copy(camera.position).addScaledVector(ray, distance);
   }
   function layout() {
     width = container.clientWidth;
@@ -464,22 +464,31 @@ export async function createScene({ container, target, reduced, onStatus }) {
     // Reuse the proven scene renderer instead of creating another WebGL context.
     const deliveryScene=new THREE.Group();
     deliveryScene.add(model);scene.add(deliveryScene);deliveryActive=true;
-    const pickupPoint=worldAt(pickup.x/width*2-1,1-pickup.y/height*2,20);
-    const approach=new THREE.CubicBezierCurve3(worldAt(1.7,-.1,15),worldAt(.9,.03,16),
-      pickupPoint.clone().add(new THREE.Vector3(3,0,0)),pickupPoint);
-    // Follow the supplied drawing: left sweep, broad right bend, upper-left departure.
-    const departure=new THREE.CatmullRomCurve3([
-      pickupPoint,worldAt(-.45,.04,30),worldAt(-.66,.25,42),worldAt(-.66,.60,65),
-      worldAt(-.40,.56,85),worldAt(.03,.40,125),worldAt(.26,.37,170),
-      worldAt(.26,.54,215),worldAt(-.12,.76,285),worldAt(-.24,.95,360),
-    ],false,'centripetal');
-    approach.v2.copy(pickupPoint).addScaledVector(departure.getTangent(0),-3);
-    approach.arcLengthDivisions=1024;approach.updateArcLengths();
-    departure.arcLengthDivisions=2048;departure.updateArcLengths();
-    const route=new THREE.CurvePath();route.add(approach);route.add(departure);
-    route.arcLengthDivisions=4096;route.updateArcLengths();
+    const pickupNdc=new THREE.Vector3(pickup.x/width*2-1,1-pickup.y/height*2,20);
+    const screenCurve=controls=>{
+      const bezier=new THREE.CubicBezierCurve3(...controls);
+      return new class extends THREE.Curve {
+        getPoint(t,target=new THREE.Vector3()){
+          const point=bezier.getPoint(t);
+          return worldAt(point.x,point.y,point.z,target);
+        }
+      }();
+    };
+    // Three broad Bezier sweeps keep both banks gradual while depth grows continuously.
+    const first=[pickupNdc,new THREE.Vector3(-.25,-.02,30),new THREE.Vector3(-.72,.30,44),new THREE.Vector3(-.70,.50,56)];
+    const secondStart=first[3],secondControl1=first[3].clone().add(first[3].clone().sub(first[2]).multiplyScalar(.8));
+    const secondControl2=new THREE.Vector3(.30,.55,120),secondEnd=new THREE.Vector3(.35,.35,155);
+    const thirdControl1=secondEnd.clone().add(secondEnd.clone().sub(secondControl2).multiplyScalar(.8));
+    const approachControl2=pickupNdc.clone().sub(first[1].clone().sub(pickupNdc).multiplyScalar(.8));
+    const approach=screenCurve([new THREE.Vector3(1.7,-.1,15),new THREE.Vector3(1.12,-.07,14),approachControl2,pickupNdc]);
+    const firstBend=screenCurve(first);
+    const secondBend=screenCurve([secondStart,secondControl1,secondControl2,secondEnd]);
+    const thirdBend=screenCurve([secondEnd,thirdControl1,new THREE.Vector3(-.12,.85,300),new THREE.Vector3(-.25,.96,420)]);
+    const route=new THREE.CurvePath();route.add(approach);route.add(firstBend);route.add(secondBend);route.add(thirdBend);
+    route.arcLengthDivisions=2048;route.updateArcLengths();
     const approachLength=approach.getLength();
-    const timing=createFlightTiming(route.getLength(),approachLength+departure.getLength()*.13);
+    const secondTurn=approachLength+firstBend.getLength()+secondBend.getLength();
+    const timing=createFlightTiming(route.getLength(),secondTurn);
     const targetOrientation=new THREE.Quaternion();
     const enginePoints=Array.from({length:17},(_,i)=>{
       const x=-2.2+i/16*4.4;
@@ -491,19 +500,39 @@ export async function createScene({ container, target, reduced, onStatus }) {
     const engineMaterial=new THREE.MeshBasicMaterial({color:0x6eeaff,toneMapped:false});
     const engineGlowMaterial=new THREE.MeshBasicMaterial({color:0x00c9f5,transparent:true,opacity:.3,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});
     model.add(new THREE.Mesh(engineGeometry,engineMaterial),new THREE.Mesh(engineGlowGeometry,engineGlowMaterial));
-    const trailSize=90, trailSegments=[];
-    const coreGeometry=new THREE.BoxGeometry(1,1,1);
-    const glowGeometry=new THREE.BoxGeometry(1.15,1,1.8);
-    const coreMaterial=new THREE.MeshBasicMaterial({color:0x68dfff,transparent:true,opacity:.45,
-      blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});
-    const glowMaterial=new THREE.MeshBasicMaterial({color:0x00a8ec,transparent:true,opacity:.18,
-      blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});
-    const coreTrail=new THREE.InstancedMesh(coreGeometry,coreMaterial,trailSize);
-    const glowTrail=new THREE.InstancedMesh(glowGeometry,glowMaterial,trailSize);
-    coreTrail.frustumCulled=false;glowTrail.frustumCulled=false;
-    deliveryScene.add(coreTrail,glowTrail);
-    const dummy=new THREE.Object3D(), direction=new THREE.Vector3(), fadeColor=new THREE.Color();
-    let trailIndex=0, previousTail;
+    const trailLifetime=1.7,trailCapacity=150,trailSamples=[];
+    const makeRibbon=()=>{
+      const geometry=new THREE.BufferGeometry();
+      geometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(trailCapacity*18),3).setUsage(THREE.DynamicDrawUsage));
+      geometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(trailCapacity*18),3).setUsage(THREE.DynamicDrawUsage));
+      const material=new THREE.MeshBasicMaterial({color:0xffffff,vertexColors:true,transparent:true,opacity:.28,
+        blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false,side:THREE.DoubleSide});
+      const mesh=new THREE.Mesh(geometry,material);mesh.frustumCulled=false;deliveryScene.add(mesh);
+      return {geometry,material};
+    };
+    const coreTrail=makeRibbon(),glowTrail=makeRibbon();
+    const trailBlue=new THREE.Color(0x74dcff);
+    let timeForTrail=0;
+    const writeRibbon=(ribbon,expand)=>{
+      const positions=ribbon.geometry.attributes.position.array,colors=ribbon.geometry.attributes.color.array;
+      let vertex=0;
+      for(let i=1;i<trailSamples.length;i++){
+        const a=trailSamples[i-1],b=trailSamples[i];
+        const fadeA=Math.pow(Math.max(0,1-(timeForTrail-a.at)/trailLifetime),1.35);
+        const fadeB=Math.pow(Math.max(0,1-(timeForTrail-b.at)/trailLifetime),1.35);
+        const edgeA=a.right.clone().sub(a.left).multiplyScalar(expand),edgeB=b.right.clone().sub(b.left).multiplyScalar(expand);
+        const al=a.left.clone().sub(edgeA),ar=a.right.clone().add(edgeA),bl=b.left.clone().sub(edgeB),br=b.right.clone().add(edgeB);
+        const verts=[al,ar,bl,bl,ar,br],fades=[fadeA,fadeA,fadeB,fadeB,fadeA,fadeB];
+        for(let j=0;j<6;j++){
+          const v=verts[j],fade=fades[j];
+          positions[vertex*3]=v.x;positions[vertex*3+1]=v.y;positions[vertex*3+2]=v.z;
+          colors[vertex*3]=trailBlue.r*fade;colors[vertex*3+1]=trailBlue.g*fade;colors[vertex*3+2]=trailBlue.b*fade;vertex++;
+        }
+      }
+      ribbon.geometry.setDrawRange(0,vertex);
+      ribbon.geometry.attributes.position.needsUpdate=true;ribbon.geometry.attributes.color.needsUpdate=true;
+      ribbon.geometry.computeBoundingSphere();
+    };
     try {
       await new Promise((resolve,reject)=>{
         let time=0, prev=performance.now(), passed=false, bank=0;
@@ -529,37 +558,27 @@ export async function createScene({ container, target, reduced, onStatus }) {
           else model.quaternion.slerp(targetOrientation,1-Math.exp(-dt*8));
           model.visible=time<timing.duration;
           model.updateMatrixWorld(true);
-          const tail=model.localToWorld(new THREE.Vector3(0,0,-2.8));
-          if(previousTail && model.visible){
-            trailSegments[trailIndex]={a:previousTail.clone(),b:tail.clone(),at:time};
-            trailIndex=(trailIndex+1)%trailSize;
+          if(model.visible){
+            const leftX=-2.2,rightX=2.2;
+            const leftZ=-1.6-Math.sqrt(6.25-leftX*leftX)*.55;
+            const rightZ=-1.6-Math.sqrt(6.25-rightX*rightX)*.55;
+            trailSamples.push({left:model.localToWorld(new THREE.Vector3(leftX,.08,leftZ)),right:model.localToWorld(new THREE.Vector3(rightX,.08,rightZ)),at:time});
           }
-          previousTail=tail;
-          for(let i=0;i<trailSize;i++){
-            const segment=trailSegments[i], age=segment ? time-segment.at : 2;
-            if(age<1){
-              direction.copy(segment.b).sub(segment.a);
-              dummy.position.copy(segment.a).add(segment.b).multiplyScalar(.5);
-              dummy.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),direction.clone().normalize());
-              dummy.scale.set(4.4*(1-age*.65),Math.max(.001,direction.length()),.12);
-              fadeColor.setRGB(1-age,1-age,1-age);
-            } else {dummy.scale.setScalar(0);fadeColor.setRGB(0,0,0);}
-            dummy.updateMatrix();
-            coreTrail.setMatrixAt(i,dummy.matrix);glowTrail.setMatrixAt(i,dummy.matrix);
-            coreTrail.setColorAt(i,fadeColor);glowTrail.setColorAt(i,fadeColor);
-          }
-          coreTrail.instanceMatrix.needsUpdate=true;glowTrail.instanceMatrix.needsUpdate=true;
-          coreTrail.instanceColor.needsUpdate=true;glowTrail.instanceColor.needsUpdate=true;
+          timeForTrail=time;
+          while(trailSamples.length>trailCapacity)trailSamples.shift();
+          while(trailSamples.length>1&&time-trailSamples[0].at>trailLifetime)trailSamples.shift();
+          writeRibbon(coreTrail,.015);writeRibbon(glowTrail,.18);
           if(!approaching && !passed){passed=true;onPass();}
           renderer.render(scene,camera);
-          if(time>=timing.duration+1 || reduced.matches || paused){if(!passed)onPass();resolve();}
+          if(time>=timing.duration+trailLifetime || reduced.matches || paused){if(!passed)onPass();resolve();}
           else requestAnimationFrame(frame);
           } catch(error) { reject(error); }
         }
         requestAnimationFrame(frame);
       });
     } finally {
-      scene.remove(deliveryScene);deliveryActive=false;engineGeometry.dispose();engineGlowGeometry.dispose();engineMaterial.dispose();engineGlowMaterial.dispose();coreGeometry.dispose();glowGeometry.dispose();coreMaterial.dispose();glowMaterial.dispose();
+      scene.remove(deliveryScene);deliveryActive=false;engineGeometry.dispose();engineGlowGeometry.dispose();engineMaterial.dispose();engineGlowMaterial.dispose();
+      for(const ribbon of [coreTrail,glowTrail]){ribbon.geometry.dispose();ribbon.material.dispose();}
 
     }
   }

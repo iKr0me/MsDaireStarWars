@@ -22,7 +22,7 @@ export function createJourney({ scene, reduced, onChange }) {
   );
   const outro = gsap.timeline({paused:true}).fromTo(
     '#farewell-crawl',
-    {y:()=>innerHeight*.05,z:0,scale:1,rotationX:58,opacity:0},
+    {y:()=>innerHeight*.27,z:0,scale:1,rotationX:58,opacity:0},
     {y:()=>-innerHeight*.18,z:-500,scale:.68,rotationX:65,opacity:1,duration:1,ease:'none'},
   );
   let locked = false,
