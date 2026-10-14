@@ -17,7 +17,7 @@
 ## Write a note started
 - [x] Draft form, name, 400-character counter, optional photo/consent and validation.
 - [x] Explicit demo delivery, Falcon flyby over the form and interaction locking.
-- [x] Preview duplicate protection and rolling-day five-preview limit.
+- [x] Preview duplicate protection; five-preview cap removed for testing.
 - [ ] Real shared saving, screening, organizer approval and approved-only public notes/photos.
 - [ ] Server-enforced limits and idempotency; real pending-submission receipt.
 

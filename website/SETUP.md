@@ -72,7 +72,7 @@ The active scene uses `r2d2_starwars_fanart.glb` and `planet_of_phoenix.glb`, co
 
 The Force Theme is included as `public/audio/force-theme.mp3`. Press the music button to start it; sound effects have a separate control. Music survives chapter changes and pauses while the tab is hidden.
 
-Write a note supports a 400-grapheme counter including spaces, a name, and an optional JPG/PNG/WebP photo up to 5 MB with public-sharing consent. In the local demo, Preview delivery plays a Falcon flyby and stores only a fingerprint/time ledger for five previews per rolling 24 hours and duplicate protection. It DOES NOT save or publish a real note, moderate text, upload a photo, or simulate organizer approval. The production Send button stays disabled until the real service is connected. These client preview limits are not server security.
+Write a note supports a 400-grapheme counter including spaces, a name, and an optional JPG/PNG/WebP photo up to 5 MB with public-sharing consent. In the local demo, Preview delivery plays a Falcon flyby and stores only a fingerprint/time ledger for duplicate protection only; the preview count limit has been removed for testing. It DOES NOT save or publish a real note, moderate text, upload a photo, or simulate organizer approval. The production Send button stays disabled until the real service is connected. This client preview protection is not server security.
 
 Remaining implementation: Supabase tables/private photo storage, server-side text/name screening, organizer approval, an approved-only read endpoint, atomic quota/idempotency enforcement and genuine pending-submission receipts.
 

@@ -14,10 +14,10 @@ test('optional photos require allowed type, size and public permission',()=>{
   assert.equal(validateDraft({...draft,consent:true,photo:{type:'image/svg+xml',size:1}}).valid,false);
   assert.equal(validateDraft({...draft,consent:true,photo:{type:'image/png',size:6*1024*1024}}).valid,false);
 });
-test('preview blocks duplicates and five rolling-day sends, expiring older entries',()=>{
+test('preview has no count limit while duplicate protection expires after a day',()=>{
   const now=100000000;
-  const entries=Array.from({length:5},(_,i)=>({fingerprint:String(i),at:now-i*1000}));
-  assert.equal(previewAllowance(entries,'new',now).allowed,false);
+  const entries=Array.from({length:50},(_,i)=>({fingerprint:String(i),at:now-i*1000}));
+  assert.equal(previewAllowance(entries,'new',now).allowed,true);
   assert.match(previewAllowance(entries,'0',now).reason,/already/);
   assert.equal(previewAllowance(entries,'new',now+86400001).allowed,true);
 });
