@@ -97,3 +97,9 @@
 - [x] Give R2 a smooth spin and depth drift at the Falcon’s pass, then return it gradually to its normal path.
 - [x] Demo build.
 - [ ] User GPU/browser visual review; browser remains blocked by the saved permission setting.
+
+## October 14 scale, depth and wake pass
+- [x] Enlarge the Falcon’s close approach across the right side while preserving its continuous, receding route.
+- [x] Push R2 farther back at the pass and ease it home over a longer interval.
+- [x] Shift the engine wake to a broader neon-blue glow and reduce particles to a sparse, gentle sparkle.
+- [ ] User GPU/browser visual review; browser remains blocked by the saved permission setting.

@@ -135,3 +135,7 @@ Production and demo builds pass after these changes. The browser preview remains
 The delivery now starts close to the camera from the lower-right, where the large Falcon crops against the screen edge before crossing the note pickup and continuing left into its existing deep-space curves. Its materials receive slightly darker, rougher shading, and the scene fill light is lower for stronger contrast. The blue wake now fades along its length and lasts longer; small blue-white particles drift away from the engine trail.
 
 When the Falcon crosses the note pickup, R2 gets a gradual spin and a short positional push upward and deeper into the scene. The droid then eases back to its normal bobbing path over several seconds. The demo build succeeds. The browser preview is still unavailable, so exact framing and shading need a visual check from the user.
+
+## October 14 depth and wake refinement
+
+The delivery Falcon now enters nearer the camera on a centered path across the mid-right, making its close pass substantially larger while the following route keeps receding into deep space. Its wake uses saturated neon blue with a broader additive glow and a few sparse, softly flickering blue-white particles. At the pass, R2 is pushed much farther behind the scene and gradually returns to its usual path over about eight seconds, with its spin reaction eased across the event. Review the close-pass crop and the depth of R2 in the local browser; GPU visual review is still unavailable here.
