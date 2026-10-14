@@ -89,3 +89,11 @@
 - [x] Reduce second-transition R2 enlargement, lengthen both crossings, and start the farewell crawl lower.
 - [x] Production and demo builds.
 - [ ] User GPU/browser visual review; browser remains blocked by the saved permission setting.
+
+## October 14 Falcon flyby polish
+- [x] Start the Falcon very close across the lower-right, then pass the pickup and continue left along its receding route.
+- [x] Deepen Falcon material and scene lighting contrast.
+- [x] Fade the engine ribbon along its tail and add drifting blue-white particles.
+- [x] Give R2 a smooth spin and depth drift at the Falcon’s pass, then return it gradually to its normal path.
+- [x] Demo build.
+- [ ] User GPU/browser visual review; browser remains blocked by the saved permission setting.

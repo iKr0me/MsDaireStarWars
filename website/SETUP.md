@@ -124,8 +124,14 @@ Falcon approach/departure tangents are matched at pickup. Earlier timing used a 
 
 ## October 14 flight and hyperspace refinement
 
-The Falcon now follows three broad connected curves: it sweeps left and upward, bends back to the right, then climbs toward the upper-left as it recedes. The curve is defined in screen space with continuously increasing depth, so the turns stay rounded and the ship shrinks more clearly. It accelerates from launch and gains a stronger speed increase after the second bend. Its blue trail is a soft, transparent ribbon sampled across the actual width of the rear engine section; it remains for 1.7 seconds as the ship departs.
+The Falcon now follows three broad connected curves: it sweeps left and upward, bends back to the right, then climbs toward the upper-left as it recedes. The curve is defined in screen space with continuously increasing depth, so the turns stay rounded and the ship shrinks more clearly. It accelerates from launch and gains a stronger speed increase after the second bend. Its blue trail is a soft, transparent ribbon sampled across the actual width of the rear engine section; it remains for 2.2 seconds as the ship departs.
 
 Both hyperspace sequences now start forming streaks with the first part of the star zoom, use 1,900 scattered ribbons with longer blue-white cores and a slight blue edge glow, and blend the incoming scene under the slowing streaks. The second sequence keeps R2 closer to its normal size while it fades away. Both crossings have more scroll travel. The farewell crawl begins lower, with the extra scroll distance carrying the same perspective crawl through its final line.
 
 Production and demo builds pass after these changes. The browser preview remains unavailable under the saved browser permission setting, so the new visuals still need review from the user’s browser or a screenshot. The generated asset samples and trail geometry have not been visually checked on a GPU.
+
+## October 14 Falcon flyby polish
+
+The delivery now starts close to the camera from the lower-right, where the large Falcon crops against the screen edge before crossing the note pickup and continuing left into its existing deep-space curves. Its materials receive slightly darker, rougher shading, and the scene fill light is lower for stronger contrast. The blue wake now fades along its length and lasts longer; small blue-white particles drift away from the engine trail.
+
+When the Falcon crosses the note pickup, R2 gets a gradual spin and a short positional push upward and deeper into the scene. The droid then eases back to its normal bobbing path over several seconds. The demo build succeeds. The browser preview is still unavailable, so exact framing and shading need a visual check from the user.

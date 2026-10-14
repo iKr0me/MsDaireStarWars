@@ -28,11 +28,11 @@ export async function createScene({ container, target, reduced, onStatus }) {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.1;
   container.append(renderer.domElement);
-  scene.add(new THREE.HemisphereLight(0xb9cbef, 0x050509, 0.38));
+  scene.add(new THREE.HemisphereLight(0xb9cbef, 0x050509, 0.30));
   const sun = new THREE.DirectionalLight(0xffead5, 3.8);
   sun.position.set(-10, 15, 12);
   scene.add(sun);
-  const fill = new THREE.DirectionalLight(0x7698e3, 0.8);
+  const fill = new THREE.DirectionalLight(0x7698e3, 0.48);
   fill.position.set(8, 3, -6);
   scene.add(fill);
   let seed = 741;
@@ -166,7 +166,8 @@ export async function createScene({ container, target, reduced, onStatus }) {
   }
   let hero, anchor, chestAnchor, signalLight, headPivot, planet, death;
   let headYaw = 0;
-  let flashStarted = -Infinity, spinEventStarted = -Infinity;
+  let flashStarted = -Infinity, spinEventStarted = -Infinity, deliveryReactionStarted = -Infinity;
+  const deliveryImpulse = new THREE.Vector3(0.7,0.42,-4.2);
   let spin = 0, spinVelocity = 0, nextSpin = 18;
   const baseCameraRotation = camera.rotation.clone();
   let paused = false,
@@ -241,16 +242,21 @@ export async function createScene({ container, target, reduced, onStatus }) {
       const t = elapsed * 0.19;
       const still = paused || reduced.matches;
       const baseY = width < 700 ? -1.1 : -1.5;
-      hero.position.x =
-        (width < 700 ? -0.3 : -1.3) + (still ? 0 : Math.sin(t) * 0.85);
-      hero.position.y = baseY + (still ? 0 : Math.sin(elapsed * 0.42) * 0.7);
-      hero.position.z = still ? 0 : Math.cos(t * 0.78) * 1.3;
+      const impactAge=elapsed-deliveryReactionStarted;
+      const impactIn=THREE.MathUtils.smoothstep(impactAge,0,.42);
+      const recovery=1-THREE.MathUtils.smoothstep(impactAge,.55,5.8);
+      const impact=impactIn*recovery;
+      hero.position.x = (width < 700 ? -0.3 : -1.3) + (still ? 0 : Math.sin(t) * 0.85) + deliveryImpulse.x*impact;
+      hero.position.y = baseY + (still ? 0 : Math.sin(elapsed * 0.42) * 0.7) + deliveryImpulse.y*impact;
+      hero.position.z = (still ? 0 : Math.cos(t * 0.78) * 1.3) + deliveryImpulse.z*impact;
       if (!still) {
         const chaseAge = fleet.visible ? elapsed - chaseStart : -1;
         const gentleAge = elapsed - spinEventStarted;
         const gust = chaseAge >= 0 && chaseAge < 4.4 ? Math.pow(Math.sin(Math.PI * chaseAge / 4.4), 2) * 1.1 : 0;
+        const deliveryAge=elapsed-deliveryReactionStarted;
+        const deliveryGust=deliveryAge>=0&&deliveryAge<4.5?Math.pow(Math.sin(Math.PI*deliveryAge/4.5),2)*1.4:0;
         const turn = gentleAge >= 0 && gentleAge < 5 ? Math.pow(Math.sin(Math.PI * gentleAge / 5), 2) * .45 : 0;
-        spinVelocity += (gust + turn - spinVelocity) * (1 - Math.exp(-dt * 2));
+        spinVelocity += (Math.max(gust,deliveryGust) + turn - spinVelocity) * (1 - Math.exp(-dt * 2));
         spin += dt * (0.035 + spinVelocity);
       }
       hero.rotation.set(
@@ -461,6 +467,17 @@ export async function createScene({ container, target, reduced, onStatus }) {
     falconPromise ??= loader.loadAsync('/models/millennium_falcon.glb').then(g=>normalize(g.scene,8));
     let model;
     try {model=(await falconPromise).clone(true);} catch(e){falconPromise=null;throw new Error('The Falcon could not load. Please try again.');}
+    model.traverse(node=>{
+      if(!node.isMesh||!node.material)return;
+      const shade=material=>{
+        const toned=material.clone();
+        if(toned.color)toned.color.multiplyScalar(.88);
+        if('roughness' in toned)toned.roughness=Math.max(toned.roughness,.68);
+        if('metalness' in toned)toned.metalness=Math.min(toned.metalness,.22);
+        return toned;
+      };
+      node.material=Array.isArray(node.material)?node.material.map(shade):shade(node.material);
+    });
     // Reuse the proven scene renderer instead of creating another WebGL context.
     const deliveryScene=new THREE.Group();
     deliveryScene.add(model);scene.add(deliveryScene);deliveryActive=true;
@@ -480,7 +497,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
     const secondControl2=new THREE.Vector3(.30,.55,120),secondEnd=new THREE.Vector3(.35,.35,155);
     const thirdControl1=secondEnd.clone().add(secondEnd.clone().sub(secondControl2).multiplyScalar(.8));
     const approachControl2=pickupNdc.clone().sub(first[1].clone().sub(pickupNdc).multiplyScalar(.8));
-    const approach=screenCurve([new THREE.Vector3(1.7,-.1,15),new THREE.Vector3(1.12,-.07,14),approachControl2,pickupNdc]);
+    const approach=screenCurve([new THREE.Vector3(1.58,-.82,5.5),new THREE.Vector3(1.08,-.72,6.5),approachControl2,pickupNdc]);
     const firstBend=screenCurve(first);
     const secondBend=screenCurve([secondStart,secondControl1,secondControl2,secondEnd]);
     const thirdBend=screenCurve([secondEnd,thirdControl1,new THREE.Vector3(-.12,.85,300),new THREE.Vector3(-.25,.96,420)]);
@@ -500,26 +517,37 @@ export async function createScene({ container, target, reduced, onStatus }) {
     const engineMaterial=new THREE.MeshBasicMaterial({color:0x6eeaff,toneMapped:false});
     const engineGlowMaterial=new THREE.MeshBasicMaterial({color:0x00c9f5,transparent:true,opacity:.3,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});
     model.add(new THREE.Mesh(engineGeometry,engineMaterial),new THREE.Mesh(engineGlowGeometry,engineGlowMaterial));
-    const trailLifetime=1.7,trailCapacity=150,trailSamples=[];
-    const makeRibbon=()=>{
+    const trailLifetime=2.2,trailCapacity=200,trailSamples=[];
+    const makeRibbon=(opacity)=>{
       const geometry=new THREE.BufferGeometry();
       geometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(trailCapacity*18),3).setUsage(THREE.DynamicDrawUsage));
       geometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(trailCapacity*18),3).setUsage(THREE.DynamicDrawUsage));
-      const material=new THREE.MeshBasicMaterial({color:0xffffff,vertexColors:true,transparent:true,opacity:.28,
+      const material=new THREE.MeshBasicMaterial({color:0xffffff,vertexColors:true,transparent:true,opacity,
         blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false,side:THREE.DoubleSide});
       const mesh=new THREE.Mesh(geometry,material);mesh.frustumCulled=false;deliveryScene.add(mesh);
       return {geometry,material};
     };
-    const coreTrail=makeRibbon(),glowTrail=makeRibbon();
+    const coreTrail=makeRibbon(.24),glowTrail=makeRibbon(.12);
     const trailBlue=new THREE.Color(0x74dcff);
+    const particleLimit=96,particles=[];
+    const particleGeometry=new THREE.BufferGeometry();
+    particleGeometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(particleLimit*3),3).setUsage(THREE.DynamicDrawUsage));
+    particleGeometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(particleLimit*3),3).setUsage(THREE.DynamicDrawUsage));
+    const particleMaterial=new THREE.PointsMaterial({color:0xffffff,size:.14,sizeAttenuation:true,vertexColors:true,
+      transparent:true,opacity:.78,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});
+    const particleCloud=new THREE.Points(particleGeometry,particleMaterial);particleCloud.frustumCulled=false;deliveryScene.add(particleCloud);
+    const particleWhite=new THREE.Color(0xc8f5ff),particleCyan=new THREE.Color(0x32bbff);
+    let nextParticleAt=.06;
     let timeForTrail=0;
     const writeRibbon=(ribbon,expand)=>{
       const positions=ribbon.geometry.attributes.position.array,colors=ribbon.geometry.attributes.color.array;
       let vertex=0;
       for(let i=1;i<trailSamples.length;i++){
         const a=trailSamples[i-1],b=trailSamples[i];
-        const fadeA=Math.pow(Math.max(0,1-(timeForTrail-a.at)/trailLifetime),1.35);
-        const fadeB=Math.pow(Math.max(0,1-(timeForTrail-b.at)/trailLifetime),1.35);
+        const alongA=THREE.MathUtils.smoothstep((i-1)/(trailSamples.length-1),0,.16);
+        const alongB=THREE.MathUtils.smoothstep(i/(trailSamples.length-1),0,.16);
+        const fadeA=Math.pow(Math.max(0,1-(timeForTrail-a.at)/trailLifetime),2.2)*alongA;
+        const fadeB=Math.pow(Math.max(0,1-(timeForTrail-b.at)/trailLifetime),2.2)*alongB;
         const edgeA=a.right.clone().sub(a.left).multiplyScalar(expand),edgeB=b.right.clone().sub(b.left).multiplyScalar(expand);
         const al=a.left.clone().sub(edgeA),ar=a.right.clone().add(edgeA),bl=b.left.clone().sub(edgeB),br=b.right.clone().add(edgeB);
         const verts=[al,ar,bl,bl,ar,br],fades=[fadeA,fadeA,fadeB,fadeB,fadeA,fadeB];
@@ -532,6 +560,29 @@ export async function createScene({ container, target, reduced, onStatus }) {
       ribbon.geometry.setDrawRange(0,vertex);
       ribbon.geometry.attributes.position.needsUpdate=true;ribbon.geometry.attributes.color.needsUpdate=true;
       ribbon.geometry.computeBoundingSphere();
+    };
+    const updateParticles=(heading,dt)=>{
+      if(model.visible&&trailSamples.length&&timeForTrail>=nextParticleAt){
+        const latest=trailSamples[trailSamples.length-1],origin=latest.left.clone().lerp(latest.right,.5);
+        for(let n=0;n<2;n++){
+          const position=origin.clone().add(new THREE.Vector3((random()-.5)*.5,(random()-.5)*.5,(random()-.5)*.3));
+          const velocity=new THREE.Vector3((random()-.5)*.9,(random()-.5)*.9,(random()-.5)*.7).addScaledVector(heading,-.2);
+          particles.push({position,velocity,born:timeForTrail,life:.9+random()*.6,color:random()<.28?particleWhite:particleCyan});
+        }
+        nextParticleAt=timeForTrail+.075;
+      }
+      let alive=0;const survivors=[],positions=particleGeometry.attributes.position.array,colors=particleGeometry.attributes.color.array;
+      for(const particle of particles){
+        const age=timeForTrail-particle.born;if(age>=particle.life)continue;
+        particle.position.addScaledVector(particle.velocity,Math.min(dt,.05));
+        const fade=Math.pow(1-age/particle.life,1.7);
+        positions[alive*3]=particle.position.x;positions[alive*3+1]=particle.position.y;positions[alive*3+2]=particle.position.z;
+        colors[alive*3]=particle.color.r*fade;colors[alive*3+1]=particle.color.g*fade;colors[alive*3+2]=particle.color.b*fade;
+        survivors.push(particle);alive++;
+      }
+      particles.splice(0,particles.length,...survivors);
+      particleGeometry.setDrawRange(0,Math.min(alive,particleLimit));
+      particleGeometry.attributes.position.needsUpdate=true;particleGeometry.attributes.color.needsUpdate=true;
     };
     try {
       await new Promise((resolve,reject)=>{
@@ -568,7 +619,8 @@ export async function createScene({ container, target, reduced, onStatus }) {
           while(trailSamples.length>trailCapacity)trailSamples.shift();
           while(trailSamples.length>1&&time-trailSamples[0].at>trailLifetime)trailSamples.shift();
           writeRibbon(coreTrail,.015);writeRibbon(glowTrail,.18);
-          if(!approaching && !passed){passed=true;onPass();}
+          updateParticles(heading,dt);
+          if(!approaching && !passed){passed=true;deliveryReactionStarted=elapsed;onPass();}
           renderer.render(scene,camera);
           if(time>=timing.duration+trailLifetime || reduced.matches || paused){if(!passed)onPass();resolve();}
           else requestAnimationFrame(frame);
@@ -579,6 +631,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
     } finally {
       scene.remove(deliveryScene);deliveryActive=false;engineGeometry.dispose();engineGlowGeometry.dispose();engineMaterial.dispose();engineGlowMaterial.dispose();
       for(const ribbon of [coreTrail,glowTrail]){ribbon.geometry.dispose();ribbon.material.dispose();}
+      particleGeometry.dispose();particleMaterial.dispose();
 
     }
   }
