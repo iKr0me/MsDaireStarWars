@@ -32,3 +32,15 @@ test("reduced motion keeps a readable static chapter throughout both crossings",
   for (const n of [0.9, 1.3, 3.1, 3.3])
     assert.notEqual(journeyState(n, true).chapter, "transition");
 });
+
+test("starfield pushes in before streaks and settles out after them", () => {
+  const before=journeyState(.415), peak=journeyState(.52), after=journeyState(.625);
+  assert.equal(before.warp,0);
+  assert.ok(before.starZoom>1);
+  assert.ok(peak.warp>.99);
+  assert.ok(peak.starZoom>before.starZoom);
+  assert.equal(after.warp,0);
+  assert.ok(after.starZoom>1 && after.starZoom<peak.starZoom);
+  assert.equal(journeyState(.66).starZoom,1);
+  assert.equal(journeyState(.52,true).starZoom,1);
+});

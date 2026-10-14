@@ -38,3 +38,24 @@
 .composer [type=submit]:disabled { background:#0b1d29; color:#668594; border-color:#28424f; box-shadow:none; }
 #photo-preview { width:64px; height:64px; object-fit:cover; border:1px solid #00c9f5; border-radius:6px; margin-top:10px; }
 #draft-status { color:#ffb6ac; min-height:18px; }
+/* A translucent veil blocks the background without blurring the galaxy. */
+.composer { background:#01050c55; pointer-events:auto; }
+.composer form { background:linear-gradient(145deg,#07131ddb,#010409d1 70%); transform-origin:50% 50%; }
+.plasma-orb {
+  position:absolute; left:50%; top:50%; width:36px; height:36px; margin:-18px;
+  pointer-events:none; border-radius:50%; opacity:0;
+  background:radial-gradient(circle,#e1fcff 0%,#36dcff 24%,#00c9f5 45%,#009bc488 70%,transparent 74%);
+  box-shadow:0 0 16px #00c9f5,0 0 45px #00c9f599,0 0 85px #00c9f544;
+}
+#galaxy .collection-panel {
+  background:linear-gradient(145deg,#07131deb,#010409e0); color:#00c9f5;
+  border:1px solid #00b9e78c; border-radius:8px;
+  font-family:"Trebuchet MS",Arial,sans-serif;
+  box-shadow:0 15px 60px #0009,0 0 24px #00b9e713;
+}
+.collection-panel .panel-heading h2 { font:700 24px "Trebuchet MS",Arial,sans-serif; color:#00c9f5; letter-spacing:0; }
+.collection-panel .close-button { color:#00c9f5; border-color:#00b9e74d; }
+.collection-panel .keepsake { color:#99d6eb; font-family:inherit; }
+.collection-panel .collection-empty,.collection-panel .collection-footnote { color:#88b3c4; border-color:#24768d; }
+#galaxy .collection-toggle { border-color:#00b9e760; background:#06121dbb; color:#a9e8fa; font-family:"Trebuchet MS",Arial,sans-serif; }
+#galaxy .collection-toggle strong,#galaxy .collection-toggle .small-heart,#galaxy .collection-toggle .chevron { color:#00c9f5; }

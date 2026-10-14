@@ -1,3 +1,4 @@
+import gsap from "gsap";
 import "./composer.css";
 import { validateDraft, previewAllowance } from "./submission.js";
 export function createComposer({ demo, reduced, scene, onLock, onDone }) {
@@ -5,6 +6,8 @@ export function createComposer({ demo, reduced, scene, onLock, onDone }) {
   const name=form.elements.sender, message=form.elements.message, photo=form.elements.photo;
   const send=root.querySelector('[type=submit]'), counter=root.querySelector('#draft-count');
   const error=root.querySelector('#draft-status'), preview=root.querySelector('#photo-preview');
+  const orb=document.createElement('div');orb.className='plasma-orb';orb.setAttribute('aria-hidden','true');root.append(orb);
+  let orbBob;
   let active=false, sending=false, url=null, previous;
   const ledgerKey='ms-daire-preview-submissions-v1';
   function validate(showError = true) {
@@ -18,7 +21,7 @@ export function createComposer({ demo, reduced, scene, onLock, onDone }) {
   function setOpen(open) {
     if(sending) return;
     active=open; root.hidden=!open; onLock(open);
-    if(open) { previous=document.activeElement; name.focus(); }
+    if(open) { gsap.set(form,{scale:1,opacity:1,borderRadius:8});gsap.set(orb,{scale:1,opacity:0});previous=document.activeElement; name.focus(); }
     else { previous?.focus({preventScroll:true}); }
   }
   form.addEventListener('input',validate);
@@ -51,13 +54,24 @@ export function createComposer({ demo, reduced, scene, onLock, onDone }) {
       // Preview records only hashes/times, never a public note or photo.
       localStorage.setItem(ledgerKey,JSON.stringify([...allowance.recent,{fingerprint,at:Date.now()}]));
       form.inert=true;
-      const passed=()=>{root.hidden=true;};
-      if(scene?.flyDelivery && !reduced.matches)await scene.flyDelivery(passed);
+      const allowMotion = !reduced.matches && !root.closest("#galaxy").classList.contains("paused");
+      if (allowMotion) {
+        await new Promise(resolve=>{
+          gsap.timeline({onComplete:resolve})
+            .to(form,{scale:.025,opacity:0,borderRadius:200,duration:.65,ease:'power3.inOut'},0)
+            .fromTo(orb,{scale:.2,opacity:0},{scale:1,opacity:1,duration:.4,ease:'sine.out'},.3);
+        });
+        orbBob=gsap.to(orb,{scale:1.12,duration:.65,repeat:-1,yoyo:true,ease:'sine.inOut'});
+      }
+      const box=orb.getBoundingClientRect();
+      const pickup={x:box.left+box.width/2,y:box.top+box.height/2};
+      const passed=()=>{orbBob?.kill();gsap.set(orb,{opacity:0});root.hidden=true;};
+      if(scene?.flyDelivery && allowMotion)await scene.flyDelivery(passed,pickup);
       else passed();
       form.reset(); if(url)URL.revokeObjectURL(url);url=null;preview.hidden=true;
       active=false;onLock(false);onDone('Delivery preview complete. No note was sent or published.');
       previous?.focus({preventScroll:true});
-    }catch(e){error.textContent=e.message;}
+    }catch(e){orbBob?.kill();gsap.set(form,{scale:1,opacity:1,borderRadius:8});gsap.set(orb,{opacity:0});root.hidden=false;error.textContent=e.message;}
     finally {sending=false;form.inert=false;validate(false);}
   });
   root.querySelector('#submission-mode').textContent=demo

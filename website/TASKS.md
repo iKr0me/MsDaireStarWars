@@ -45,3 +45,13 @@
 - [x] Longer hyperspace streaks and background music volume at 40%.
 - [x] Vercel demo configuration, Node.js 24 pin and publishing guide.
 - [ ] Publish repository and deploy through the user’s GitHub/Vercel accounts.
+
+## Latest motion and UI update
+- [x] Eased starfield zoom, delayed longer streaks, and zoom-out on arrival.
+- [x] Translucent composer/backdrop with blocked background input.
+- [x] Consistent cyan collection controls and gallery.
+- [x] Plasma form compaction and pickup at the Falcon’s crossing.
+- [x] Extended bank-and-recede Falcon route with one-second blue trail decay.
+- [x] Occasional independent head wandering and viewer glances.
+- [x] Tests and local production/demo builds.
+- [ ] New visual confirmation from screenshots; changes pushed/deployed through user accounts.

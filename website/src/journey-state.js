@@ -30,16 +30,15 @@ export function journeyState(units, reduced = false) {
         ? "galaxy"
         : "farewell"
     : animatedChapter;
-  const warp = reduced
-    ? 0
-    : enter > 0 && enter < 1
-      ? Math.sin(enter * Math.PI)
-      : leave > 0 && leave < 1
-        ? Math.sin(leave * Math.PI)
-        : 0;
+  const phase = enter > 0 && enter < 1 ? enter : leave > 0 && leave < 1 ? leave : 0;
+  // First push gently into the stars, then streak, then settle back out.
+  const warp = reduced || phase <= .25 || phase >= .75
+    ? 0 : Math.sin(clamp((phase - .25) / .5) * Math.PI);
+  const starZoom = reduced ? 1 : 1 + Math.pow(Math.sin(phase * Math.PI),2) * .65;
   return {
     chapter,
     warp,
+    starZoom,
     sceneVisible: reduced
       ? chapter === "galaxy"
       : units >= 0.52 && units < 1.49,

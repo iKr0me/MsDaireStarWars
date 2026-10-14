@@ -53,7 +53,7 @@ export function createJourney({ scene, reduced, onChange }) {
       outro.progress(s.farewell, true);
     }
     warp.style.opacity = String(s.warp * 0.94);
-    scene?.setJourney({ visible: s.sceneVisible, warp: s.warp });
+    scene?.setJourney({ visible: s.sceneVisible, warp: s.warp, starZoom:s.starZoom });
     if (current !== s.chapter) {
       current = s.chapter;
       onChange(s.chapter);

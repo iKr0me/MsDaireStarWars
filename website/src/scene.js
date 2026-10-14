@@ -92,7 +92,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
       void main(){
         float progress=fract(seed+time*speed);
         float radius=.065+pow(progress,2.)*1.5;
-        float length=(.003+pow(progress,3.)*.48)*strength;
+        float length=(.003+pow(progress,3.)*.56)*strength;
         vec2 direction=vec2(cos(angle),sin(angle));
         vec2 normal=vec2(-direction.y,direction.x);
         float width=.0006+pow(progress,2.)*.005;
@@ -161,7 +161,8 @@ export async function createScene({ container, target, reduced, onStatus }) {
     wrapper.add(inner);
     return wrapper;
   }
-  let hero, anchor, chestAnchor, signalLight, planet, death;
+  let hero, anchor, chestAnchor, signalLight, headPivot, planet, death;
+  let headYaw = 0;
   let flashStarted = -Infinity, spinEventStarted = -Infinity;
   let spin = 0, spinVelocity = 0, nextSpin = 18;
   const baseCameraRotation = camera.rotation.clone();
@@ -253,6 +254,13 @@ export async function createScene({ container, target, reduced, onStatus }) {
         -0.35 + spin,
         still ? 0 : Math.sin(t) * 0.12 + Math.sin(spin) * Math.min(spinVelocity, 0.35),
       );
+    }
+    if (headPivot && !paused && !reduced.matches) {
+      const phase = elapsed % 28;
+      const lookingAtViewer = phase > 14 && phase < 21;
+      const desired = lookingAtViewer ? THREE.MathUtils.clamp(-hero.rotation.y,-1.1,1.1) : Math.sin(elapsed*.24)*.5;
+      headYaw += (desired-headYaw)*(1-Math.exp(-dt*1.4));
+      headPivot.rotation.y = headYaw;
     }
     if (!paused && !reduced.matches) {
       const strength = reading ? 0.15 : 1;
@@ -386,6 +394,14 @@ export async function createScene({ container, target, reduced, onStatus }) {
     signalLight.position.copy(lightBox.getCenter(new THREE.Vector3()));
     signalLight.position.z = lightBox.max.z + .015;
     hero.add(signalLight);
+    const headNode = hero.getObjectByName('o_r2d2_head');
+    const eyeNode = hero.getObjectByName('o_r2d2_eyes');
+    const headBox = new THREE.Box3().setFromObject(headNode);
+    headPivot = new THREE.Group();
+    headPivot.position.copy(headBox.getCenter(new THREE.Vector3()));
+    hero.add(headPivot);hero.updateMatrixWorld(true);
+    headPivot.attach(headNode);headPivot.attach(eyeNode);
+    headPivot.attach(signalLight);headPivot.attach(anchor);
     available = true;
     layout();
     renderer.setAnimationLoop(render);
@@ -425,7 +441,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
     })
     .catch((error) => console.warn("Distant chase models unavailable:", error));
   let falconPromise;
-  async function flyDelivery(onPass) {
+  async function flyDelivery(onPass, pickup = {x:width/2,y:height/2}) {
     if (paused || reduced.matches || !available) { onPass(); return; }
     falconPromise ??= loader.loadAsync('/models/millennium_falcon.glb').then(g=>normalize(g.scene,8));
     let model;
@@ -441,30 +457,78 @@ export async function createScene({ container, target, reduced, onStatus }) {
     const canvas=deliveryRenderer.domElement;
     Object.assign(canvas.style,{position:'absolute',inset:'0',width:'100%',height:'100%',zIndex:'30',pointerEvents:'none'});
     container.parentElement.append(canvas);
-    const curve=new THREE.CubicBezierCurve3(worldAt(1.7,-.1,15),worldAt(.5,.1,19),worldAt(-.6,.4,42),worldAt(-1.7,.65,150));
-    await new Promise(resolve=>{
-      let time=0, prev=performance.now(), passed=false;
-      function frame(now){
-        if(!document.hidden)time+=Math.min((now-prev)/1000,.05);prev=now;
-        const t=Math.min(1,time/3.6);
-        model.position.copy(curve.getPoint(t));
-        model.quaternion.setFromUnitVectors(forward,curve.getTangent(t).normalize());
-        model.rotateZ(Math.sin(t*Math.PI)*-.45);
-        if(t>.4 && !passed){passed=true;onPass();}
-        deliveryRenderer.render(deliveryScene,deliveryCamera);
-        if(t===1 || reduced.matches || paused){if(!passed)onPass();resolve();}
-        else requestAnimationFrame(frame);
-      }
-      requestAnimationFrame(frame);
-    });
-    canvas.remove();deliveryRenderer.dispose();deliveryRenderer.forceContextLoss();
+    const pickupPoint=worldAt(pickup.x/width*2-1,1-pickup.y/height*2,20);
+    const approach=new THREE.CubicBezierCurve3(worldAt(1.7,-.1,15),worldAt(.9,.03,16),
+      pickupPoint.clone().add(new THREE.Vector3(3,0,0)),pickupPoint);
+    const departure=new THREE.CatmullRomCurve3([pickupPoint,worldAt(-1.08,.05,42),
+      worldAt(-1.12,.36,75),worldAt(.25,.55,155),worldAt(1.5,.65,300)],false,'centripetal');
+    const trailSize=90, trailSegments=[];
+    const coreGeometry=new THREE.CylinderGeometry(.045,.045,1,6);
+    const glowGeometry=new THREE.CylinderGeometry(.16,.16,1,6);
+    const coreMaterial=new THREE.MeshBasicMaterial({color:0x68dfff,transparent:true,opacity:.85,
+      blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});
+    const glowMaterial=new THREE.MeshBasicMaterial({color:0x00a8ec,transparent:true,opacity:.18,
+      blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});
+    const coreTrail=new THREE.InstancedMesh(coreGeometry,coreMaterial,trailSize);
+    const glowTrail=new THREE.InstancedMesh(glowGeometry,glowMaterial,trailSize);
+    coreTrail.frustumCulled=false;glowTrail.frustumCulled=false;
+    deliveryScene.add(coreTrail,glowTrail);
+    const dummy=new THREE.Object3D(), direction=new THREE.Vector3(), fadeColor=new THREE.Color();
+    let trailIndex=0, previousTail;
+    try {
+      await new Promise(resolve=>{
+        let time=0, prev=performance.now(), passed=false;
+        function frame(now){
+          if(!document.hidden)time+=Math.min((now-prev)/1000,.05);prev=now;
+          const approaching=time<1.8;
+          const t=approaching ? Math.min(1,time/1.8) : Math.min(1,(time-1.8)/5.6);
+          const curve=approaching ? approach : departure;
+          model.position.copy(curve.getPoint(t));
+          model.quaternion.setFromUnitVectors(forward,curve.getTangent(t).normalize());
+          model.rotateZ(approaching ? -Math.sin(t*Math.PI)*.15 : -Math.sin(t*Math.PI*1.4)*.75);
+          model.visible=time<7.4;
+          model.updateMatrixWorld(true);
+          const tail=model.localToWorld(new THREE.Vector3(0,0,-2.8));
+          if(previousTail && model.visible){
+            trailSegments[trailIndex]={a:previousTail.clone(),b:tail.clone(),at:time};
+            trailIndex=(trailIndex+1)%trailSize;
+          }
+          previousTail=tail;
+          for(let i=0;i<trailSize;i++){
+            const segment=trailSegments[i], age=segment ? time-segment.at : 2;
+            if(age<1){
+              direction.copy(segment.b).sub(segment.a);
+              dummy.position.copy(segment.a).add(segment.b).multiplyScalar(.5);
+              dummy.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),direction.clone().normalize());
+              dummy.scale.set(1,Math.max(.001,direction.length()),1);
+              fadeColor.setRGB(1-age,1-age,1-age);
+            } else {dummy.scale.setScalar(0);fadeColor.setRGB(0,0,0);}
+            dummy.updateMatrix();
+            coreTrail.setMatrixAt(i,dummy.matrix);glowTrail.setMatrixAt(i,dummy.matrix);
+            coreTrail.setColorAt(i,fadeColor);glowTrail.setColorAt(i,fadeColor);
+          }
+          coreTrail.instanceMatrix.needsUpdate=true;glowTrail.instanceMatrix.needsUpdate=true;
+          coreTrail.instanceColor.needsUpdate=true;glowTrail.instanceColor.needsUpdate=true;
+          if(!approaching && !passed){passed=true;onPass();}
+          deliveryRenderer.render(deliveryScene,deliveryCamera);
+          if(time>=8.4 || reduced.matches || paused){if(!passed)onPass();resolve();}
+          else requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      });
+    } finally {
+      canvas.remove();coreGeometry.dispose();glowGeometry.dispose();coreMaterial.dispose();glowMaterial.dispose();
+      deliveryRenderer.dispose();deliveryRenderer.forceContextLoss();
+    }
   }
+
   return {
     flyDelivery,
     signalNote() { flashStarted = performance.now(); },
-    setJourney({ visible, warp }) {
+    setJourney({ visible, warp, starZoom = 1 }) {
       chapterVisible = visible;
       content.visible = visible;
+      stars.scale.set(starZoom,starZoom,1);
       const amount = reduced.matches ? 0 : warp;
       tunnelBackdrop.visible = amount > 0.01;
       tunnelBackdropMaterial.uniforms.strength.value = amount;

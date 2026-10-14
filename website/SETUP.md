@@ -91,3 +91,11 @@ R2’s ambient clock now runs at its normal gentle speed while reading; note inp
 TIE evasion is a shallow, gradual climb with modest banking and a heading that follows the climbing path. Flights alternate between right-to-left departures and an opposite pass ending behind the Phoenix planet, where the normal depth buffer occludes distant craft.
 
 The heart now remains solid during flight and reveals its text on arrival without the folding-cover opening sequence. It remains heart-shaped and gently bobs while readable. Hyperspace ribbon winding was reversed to face the camera; DoubleSide is enabled as a guard against orientation changes. This addresses the invisible-streak regression shown in the supplied capture. Visual confirmation of the new changes is pending user screenshots.
+
+## Plasma pickup and staged warp
+
+Hyperspace now separates an initial eased starfield push-in from the bright streak window, followed by a zoom-out into the next chapter. Reversing the scroll reverses those stages. Streak length increased slightly again. The journey state test checks that stars zoom before streaks and settle after them.
+
+The composer has a translucent dark backdrop that intercepts clicks without blurring the galaxy. Collection controls and gallery now share its cyan sans-serif design. A valid demo preview collapses the form into a glowing plasma orb; the Falcon crosses that exact screen position before the orb disappears. It banks to the left and returns toward the right while receding along a longer 7.4-second route. Engine-trail segments fade over one second, with the final trail allowed to clear before input unlocks. Motion pause and reduced motion skip the pickup choreography. Actual shared submission remains unconnected.
+
+R2’s head and eye meshes have a separate pivot preserving their source transforms; occasional smooth glances compensate for body orientation to face the viewer, interspersed with wandering turns. The light and note-origin marker follow that head pivot; the click target remains on the body. Visual confirmation of the new choreography remains pending screenshots.
