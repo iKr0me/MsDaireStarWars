@@ -26,8 +26,11 @@ const notebook = new Notebook({
     persist: (value) => localStorage.setItem(key, JSON.stringify(value)),
   }),
   audio = createAudio();
-let notes = await adapter.list(),
-  scene,
+let notes = [], initialLoadError = null;
+let notesLoading = true;
+// A slow database must never block the audio choice or the scene startup.
+const initialNotes = adapter.list().then(value => ({notes:value}), error => ({error}));
+let scene,
   reader,
   composer,
   journey,
@@ -52,7 +55,7 @@ function status(message, timeout = 0) {
 $("mode-label").textContent =
   adapter.mode === "demo"
     ? "Demo — sample messages"
-    : "Preview — notes not connected";
+    : "For Ms. Daire";
 $("reset-demo").hidden = adapter.mode !== "demo";
 function syncScrollLock() {
   journey?.setLocked(audioGateActive || notebook.busy || composer?.active || !panel.hidden || !$("credits").hidden);
@@ -277,7 +280,7 @@ reader = createReader({
     } else target.focus({ preventScroll: true });
   },
 });
-composer = createComposer({demo:adapter.mode==="demo", reduced, scene,
+composer = createComposer({adapter, reduced, scene,
   onLock() { stateChanged(notebook.state); syncScrollLock(); },
   onDone:message=>status(message,6000)});
 $("write-note").addEventListener("click",()=>{
@@ -285,19 +288,42 @@ $("write-note").addEventListener("click",()=>{
   panel.hidden=true;collectionToggle.setAttribute("aria-expanded","false");composer.open();
 });
 stateChanged("idle");
-if (!notes.length)
-  status("Real notes will appear after the shared service is connected.");
+if (adapter.mode === 'live') status('Loading approved notes…');
+initialNotes.then(result => {
+  notesLoading = false;
+  if (result.error) {
+    initialLoadError = result.error;
+    status(initialLoadError.message);
+  } else {
+    notes = result.notes;
+    renderCollection();stateChanged(notebook.state);
+    status(notes.length ? '' : 'No approved notes yet. You can be the first to write one.');
+  }
+});
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) audio.stop();
 });
+let refreshing = false;
 async function refresh() {
-  if (notebook.busy || composer?.active) return;
+  if (document.hidden || notesLoading || refreshing || notebook.busy || composer?.active) return;
+  refreshing = true;
   try {
-    notes = await adapter.list();
+    const updated = await adapter.list();
+    // A reader may have opened while the request was in flight.
+    if (notebook.busy || composer?.active) return;
+    const wasEmpty = !notes.length;
+    notes = updated;
     renderCollection();
     stateChanged("idle");
+    if (initialLoadError || wasEmpty || !notes.length) {
+      initialLoadError = null;
+      status(notes.length ? "" : "No approved notes yet. You can be the first to write one.");
+    }
   } catch {
     status("Couldn’t refresh notes. Please try again later.", 4000);
+  } finally {
+    refreshing = false;
   }
 }
 window.addEventListener("focus", refresh);
+if (adapter.mode === "live") setInterval(refresh, 45000);

@@ -43,6 +43,13 @@ export function createReader({
     originControl = control;
     document.querySelector("#reader-message").textContent = note.message;
     document.querySelector("#reader-sender").textContent = note.sender;
+    const photo = document.querySelector("#reader-photo");
+    photo.hidden = true;
+    photo.removeAttribute("src");
+    photo.alt = `Photo shared by ${note.sender}`;
+    photo.onload = () => { photo.hidden = !photo.getAttribute('src'); };
+    photo.onerror = () => { photo.hidden = true; };
+    if (note.photoUrl) photo.src = note.photoUrl;
     document.querySelector("#letter-number").textContent =
       "";
     root.hidden = false;

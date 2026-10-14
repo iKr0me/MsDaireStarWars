@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
+    "dev:live": "vite --mode live --host 127.0.0.1",
     "build": "vite build",
     "build:demo": "vite build --mode demo --outDir dist-demo",
     "preview": "vite preview --host 127.0.0.1",
@@ -12,9 +13,11 @@
   },
   "dependencies": {
     "gsap": "^3.15.0",
+    "sharp": "^0.35.5",
     "three": "^0.186.1"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.9",
     "vite": "^8.3.4"
   },
   "engines": {

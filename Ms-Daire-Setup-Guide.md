@@ -1,5 +1,15 @@
 # Ms. Daire’s Galaxy — setup guide
 
+> **Current saved-notes implementation — October 14, 2026**
+>
+> Continue the existing `website/` application. Saved-note API routes, a Supabase SQL setup, private photo storage, and organizer approval are now implemented locally; real saving still requires your Supabase project and private settings. No live Supabase connection or deployment has been verified yet.
+>
+> Current screening uses local automatic rules followed by organizer approval in the Supabase Table Editor. Flagged text additionally requires a separate explicit `moderation_override = true`; the original flags remain recorded. No OpenAI API account or key is required for this implementation.
+>
+> [website/SUPABASE-SETUP.md](website/SUPABASE-SETUP.md) and [website/DEPLOY.md](website/DEPLOY.md) are the authoritative setup and deployment instructions. They supersede older demo-only status, OpenAI-only moderation plans, credential lists, and from-scratch build steps below. Use `npm run dev` for unlimited demo previews and `npm run dev:live` for real saved notes after setup. Preserve the existing scene and animations.
+
+## Earlier planning notes (historical)
+
 Updated October 13, 2026. Begin with [START-HERE.md](START-HERE.md) and [MORNING-CHECKLIST.md](MORNING-CHECKLIST.md). Open the **root folder of the extracted complete kit** in Cursor. The companion `Cursor-Prompt-Ms-Daire.md` directs Cursor to create a fresh Vite + vanilla JavaScript + Three.js + GSAP app in `website/`. This guide explains services and deployment. `Hackathon-Build-and-Cost-Plan.md` adds the build sequence, budget choices, and classroom presentation plan.
 
 For the complete tool/asset inventory and first Cursor session, read `Resources-and-Cursor-Guide.md`.
@@ -24,7 +34,7 @@ Start with **GPT-6.1 Sol · Medium** if available in your Codex model picker. Us
 
 For club members, the verified student offer is **$100 in Codex credits**, subject to student verification, for current university students studying and residing in the United States or Canada. Credits expire 12 months after the grant and are not API credits. Do not promise universal free ChatGPT Plus. Students can apply with a Free, Go, Plus, or Pro account. [Official student offer](https://developers.openai.com/community/students).
 
-The coding account is separate from the website's moderation API access. Students should use their own accounts and enter secrets privately.
+The coding account is separate from the website's Supabase settings. Current text screening needs no moderation API key. Students should enter service secrets privately.
 
 ## Before you begin
 
@@ -36,7 +46,7 @@ Have these ready before asking the agent to run the project:
 4. The supplied root prompt, `3D_Models/`, and `audio/` folders kept together. Cursor copies the needed runtime assets into `website/public/`; you do not need to move files individually.
 5. A browser for desktop checks and an actual phone for final touch/performance checks.
 
-Vercel, Supabase, and OpenAI API are required before the live submission/review system can be fully tested, but you can build the visual scene before those accounts are connected. No custom domain, Blender installation, or special MCP connection is required to start. Blender is optional for editing model geometry. The supplied X-wing already has an empty cockpit.
+For the current live submission/review system, Supabase setup and Vercel deployment settings are required; an OpenAI API account is not needed, but you can build the visual scene before those accounts are connected. No custom domain, Blender installation, or special MCP connection is required to start. Blender is optional for editing model geometry. The supplied X-wing already has an empty cockpit.
 
 ## 1. Open the kit and keep the prototype as a reference
 

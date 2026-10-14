@@ -1,5 +1,15 @@
 # Build, demonstrate, and teach Ms. Daire’s Galaxy
 
+> **Current saved-notes implementation — October 14, 2026**
+>
+> Continue the existing `website/` application. Saved-note API routes, a Supabase SQL setup, private photo storage, and organizer approval are now implemented locally; real saving still requires your Supabase project and private settings. No live Supabase connection or deployment has been verified yet.
+>
+> Current screening uses local automatic rules followed by organizer approval in the Supabase Table Editor. Flagged text additionally requires a separate explicit `moderation_override = true`; the original flags remain recorded. No OpenAI API account or key is required for this implementation.
+>
+> [website/SUPABASE-SETUP.md](website/SUPABASE-SETUP.md) and [website/DEPLOY.md](website/DEPLOY.md) are the authoritative setup and deployment instructions. They supersede older demo-only status, OpenAI-only moderation plans, credential lists, and from-scratch build steps below. Use `npm run dev` for unlimited demo previews and `npm run dev:live` for real saved notes after setup. Preserve the existing scene and animations.
+
+## Earlier planning notes (historical)
+
 Updated October 13, 2026.
 
 Use Cursor to build one working experience at a time. Start with the supplied models and a small set of clearly labeled sample notes, then connect the real moderation and storage. This gives you something useful to demonstrate early without confusing a prototype with the finished public website.

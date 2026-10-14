@@ -1,5 +1,15 @@
 # Ms. Daire’s Galaxy: resources, connections, and Cursor workflow
 
+> **Current saved-notes implementation — October 14, 2026**
+>
+> Continue the existing `website/` application. Saved-note API routes, a Supabase SQL setup, private photo storage, and organizer approval are now implemented locally; real saving still requires your Supabase project and private settings. No live Supabase connection or deployment has been verified yet.
+>
+> Current screening uses local automatic rules followed by organizer approval in the Supabase Table Editor. Flagged text additionally requires a separate explicit `moderation_override = true`; the original flags remain recorded. No OpenAI API account or key is required for this implementation.
+>
+> [website/SUPABASE-SETUP.md](website/SUPABASE-SETUP.md) and [website/DEPLOY.md](website/DEPLOY.md) are the authoritative setup and deployment instructions. They supersede older demo-only status, OpenAI-only moderation plans, credential lists, and from-scratch build steps below. Use `npm run dev` for unlimited demo previews and `npm run dev:live` for real saved notes after setup. Preserve the existing scene and animations.
+
+## Earlier planning notes (historical)
+
 Updated October 13, 2026. Start with [START-HERE.md](START-HERE.md) and [MORNING-CHECKLIST.md](MORNING-CHECKLIST.md), then open the extracted kit root in Cursor. Use one main agent to create the app inside `website/`. The site uses the supplied 3D models and a small server connected to Supabase, moderation, and submission limits. Review notes directly in Supabase. Extra coding plugins and simultaneous builders are optional.
 
 ## What is already made, and what still needs building
@@ -72,7 +82,7 @@ No separate OpenRouter purchase, Roo Code extension, Cline extension, Vercel MCP
 5. Have Cursor check Node/Git, initialize Git at the kit root if needed, scaffold Vite inside `website/`, install local dependencies, copy the selected models, configure supplied audio, and document exact startup commands. No global Three.js, GSAP, or Vite installation is needed.
 6. Build one complete demo slice: real 3D hero drift → press R2 → heart arrives from his current world position → read/close → count once → reopen from collection. Use labeled sample notes and no production credentials.
 7. Add Falcon form delivery and reversible crawl/hyperspace/farewell. Review motion, mobile layout, and reading comfort, with a Git checkpoint after each working stage.
-8. Create Supabase, OpenAI API, GitHub, and Vercel accounts when ready for live integration. Existing accounts are fine. Supabase dashboard access is your organizer access.
+8. Create Supabase, GitHub, and Vercel accounts when ready for live integration; current local-rule screening needs no OpenAI API account. Existing accounts are fine. Supabase dashboard access is your organizer access.
 9. Ask Cursor to create `website/SETUP.md`, migrations, private storage policies, database publication guards, `.env.example`, and ignore rules. Apply the documented migrations to the intended Supabase project and configure the private bucket's size/type limits.
 10. Enter keys privately as described in `website/SETUP.md`. Start the documented server-backed development mode, then test a real submission, Table Editor approval, and reading in another browser.
 11. Push the kit repository with secrets excluded. Import it into Vercel with **Root Directory `website`**, use the documented build settings, add production environment variables, and deploy.

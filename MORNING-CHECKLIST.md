@@ -1,5 +1,15 @@
 # Your morning build checklist
 
+> **Current saved-notes implementation — October 14, 2026**
+>
+> Continue the existing `website/` application. Saved-note API routes, a Supabase SQL setup, private photo storage, and organizer approval are now implemented locally; real saving still requires your Supabase project and private settings. No live Supabase connection or deployment has been verified yet.
+>
+> Current screening uses local automatic rules followed by organizer approval in the Supabase Table Editor. Flagged text additionally requires a separate explicit `moderation_override = true`; the original flags remain recorded. No OpenAI API account or key is required for this implementation.
+>
+> [website/SUPABASE-SETUP.md](website/SUPABASE-SETUP.md) and [website/DEPLOY.md](website/DEPLOY.md) are the authoritative setup and deployment instructions. They supersede older demo-only status, OpenAI-only moderation plans, credential lists, and from-scratch build steps below. Use `npm run dev` for unlimited demo previews and `npm run dev:live` for real saved notes after setup. Preserve the existing scene and animations.
+
+## Earlier planning notes (historical)
+
 ## Before opening Cursor
 
 1. Extract the latest `Ms-Daire-Cursor-Kit.zip` into a normal working folder. Keep the ZIP as a backup. Do not edit files inside the ZIP.

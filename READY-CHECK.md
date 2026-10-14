@@ -1,3 +1,7 @@
+# Saved-notes checkpoint — October 14, 2026
+
+The Vercel API, Supabase migration, approval guards, private processed photos, browser quotas, and retry protection are implemented. Account creation and live verification are still pending. Follow [website/SUPABASE-SETUP.md](website/SUPABASE-SETUP.md) and [website/DEPLOY.md](website/DEPLOY.md). The preparation checks below describe earlier stages.
+
 # Final preparation check
 
 ## Ready for Cursor
@@ -17,7 +21,7 @@
 
 The first local R2-to-heart-note slice is implemented in `website/`. Real cloud services and deployment remain unconnected. The labeled sample-note adapter runs without backend credentials.
 
-Real submissions require the Supabase/OpenAI setup, generated database migrations, private environment values, and a successful submit → organizer approval → second-browser read test. Publishing also requires Vercel setup and a deployed check.
+Real submissions require the Supabase setup in `website/SUPABASE-SETUP.md`, the supplied database migration, private environment values, and a successful submit → organizer approval → second-browser read test. The implemented rule-based screening needs no OpenAI account or key. Publishing also requires Vercel setup and a deployed check.
 
 The exact Force Suite and exact linked R2 recordings are not bundled. The included droid alternatives are usable; replacing them is optional. The requested music needs a permitted local file before its background loop can work. Its seamlessness and final mix cannot be verified until that recording is supplied.
 

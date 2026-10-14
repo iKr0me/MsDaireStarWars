@@ -430,6 +430,13 @@
   overflow-wrap: anywhere;
   line-height: 1.15;
 }
+.sender-photo {
+  width: clamp(28px, 4vw, 44px);
+  height: clamp(28px, 4vw, 44px);
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1px solid #c59eac;
+}
 .letter-bottom {
   top: 85.5%;
 }

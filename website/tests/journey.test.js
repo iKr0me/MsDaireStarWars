@@ -11,7 +11,7 @@ test('chapters reverse without accumulated state and final scroll stops at farew
 test('five warp stages increase count/length before slowing and settling',()=>{
  assert.ok(at(.1).warp>0);assert.ok(at(.1).starZoom>1);
  assert.ok(at(.35).warp>0 && at(.35).warp<at(.55).warp);
- assert.ok(at(.58).warp>.99);assert.ok(at(.7).warp<at(.6).warp);
+ assert.ok(at(.55).warp>.99);assert.ok(at(.7).warp<at(.6).warp);
  assert.ok(at(.9).warp>0);assert.ok(at(.9).starZoom<at(.6).starZoom);
  assert.ok(at(.9).sceneScale<1);assert.equal(at(1).sceneScale,1);
  assert.ok(at(.1,C.leaveStart,C.leaveEnd).sceneScale>1);

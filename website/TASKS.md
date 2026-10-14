@@ -116,3 +116,17 @@
 - [x] Start R2’s fling at the Falcon’s first on-screen entry from the right.
 - [x] Slow the same down-left/deep-space displacement across the existing three backward cartwheels, preserving the mid-tumble beep and gradual return.
 - [ ] User GPU/browser visual review; browser remains blocked by the saved permission setting.
+
+## October 14 saved notes and Supabase review
+- [x] Add server endpoints for saving pending notes and reading approved notes/photos.
+- [x] Create Supabase SQL for private storage, restricted access, review guards and atomic limits.
+- [x] Preserve retry IDs and enforce five real submissions per browser per rolling 24 hours; keep demo previews unlimited.
+- [x] Screen text, require organizer review, and gate flagged publishing on an explicit override.
+- [x] Process optional portraits, strip metadata, and display only separately approved photos.
+- [x] Confirm saving before the Falcon animation; retain drafts on failed or uncertain saves.
+- [x] Refresh approved notes without increasing collection counts for repeats.
+- [x] Prepare live local mode, server-only settings and GitHub/Vercel/Supabase instructions.
+- [x] Pass 55 automated checks, both builds, and the unconfigured local API check.
+- [ ] Create/connect the user's Supabase project and execute the migration there.
+- [ ] Verify a real submit → approve → second-browser read → withdraw on the live service.
+- [ ] Visual review of live form states and portraits in the user's browser.

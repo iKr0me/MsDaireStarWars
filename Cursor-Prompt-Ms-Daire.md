@@ -1,6 +1,16 @@
 # Build Ms. Daire’s Galaxy of Good Wishes
 
-**Current implementation update (October 13):** Continue the existing `website/` app. The latest user direction replaces the open-cockpit hero with `r2d2_starwars_fanart.glb` and Coruscant with `planet_of_phoenix.glb`; no added atmosphere shell. Older cockpit/Coruscant directions below are historical and superseded. Use green chase bolts, evasive TIE flight, darker stars and shading, damped R2 spin reactions, steep bold yellow crawls, shorter reversible hyperspace crossings, and a centered final stop. Force Theme is now supplied locally. Do not fetch extra media without organizer approval.
+> **Current saved-notes implementation — October 14, 2026**
+>
+> Continue the existing `website/` application. Saved-note API routes, a Supabase SQL setup, private photo storage, and organizer approval are now implemented locally; real saving still requires your Supabase project and private settings. No live Supabase connection or deployment has been verified yet.
+>
+> Current screening uses local automatic rules followed by organizer approval in the Supabase Table Editor. Flagged text additionally requires a separate explicit `moderation_override = true`; the original flags remain recorded. No OpenAI API account or key is required for this implementation.
+>
+> [website/SUPABASE-SETUP.md](website/SUPABASE-SETUP.md) and [website/DEPLOY.md](website/DEPLOY.md) are the authoritative setup and deployment instructions. They supersede older demo-only status, OpenAI-only moderation plans, credential lists, and from-scratch build steps below. Use `npm run dev` for unlimited demo previews and `npm run dev:live` for real saved notes after setup. Preserve the existing scene and animations.
+
+## Earlier planning notes (historical)
+
+**Historical implementation update (October 13):** Continue the existing `website/` app. The latest user direction replaces the open-cockpit hero with `r2d2_starwars_fanart.glb` and Coruscant with `planet_of_phoenix.glb`; no added atmosphere shell. Older cockpit/Coruscant directions below are historical and superseded. Use green chase bolts, evasive TIE flight, darker stars and shading, damped R2 spin reactions, steep bold yellow crawls, shorter reversible hyperspace crossings, and a centered final stop. Force Theme is now supplied locally. Do not fetch extra media without organizer approval.
 
 The reader stays heart-shaped. The composer is a clearly labeled delivery preview; real Supabase saving, screening and approval remain to implement. Read `website/TASKS.md` and `website/SETUP.md` before proceeding.
 
