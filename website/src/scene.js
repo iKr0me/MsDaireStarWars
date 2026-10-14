@@ -1,3 +1,4 @@
+import { createFlightTiming } from "./delivery-timing.js";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 const files = {
@@ -114,7 +115,19 @@ export async function createScene({ container, target, reduced, onStatus }) {
   });
   const tunnel=new THREE.Mesh(tunnelGeometry,tunnelMaterial);
   tunnel.frustumCulled=false;tunnel.renderOrder=40;tunnel.visible=false;scene.add(tunnel);
-  let chapterVisible = false;
+  let chapterVisible = false, journeyOpacity = 1;
+  const fadeMaterials=new Map();
+  function applyContentOpacity(){
+    content.traverse(node=>{
+      for(const material of node.material ? (Array.isArray(node.material)?node.material:[node.material]) : []){
+        if(!fadeMaterials.has(material))fadeMaterials.set(material,{opacity:material.opacity,transparent:material.transparent,depthWrite:material.depthWrite});
+        const base=fadeMaterials.get(material), transparent=base.transparent || journeyOpacity<.999;
+        if(material.transparent!==transparent){material.transparent=transparent;material.needsUpdate=true;}
+        material.opacity=base.opacity*journeyOpacity;
+        material.depthWrite=base.depthWrite && journeyOpacity>.999;
+      }
+    });
+  }
   const fleet = new THREE.Group();
   fleet.visible = false;
   content.add(fleet);
@@ -205,6 +218,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
       planet.scale.setScalar(radius);
     }
     if (death) death.position.copy(worldAt(-0.73, 0.2, 65));
+    applyContentOpacity();
   }
   function updateTarget() {
     if (!anchor) return;
@@ -270,7 +284,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
       const age = (now - flashStarted) / 1000;
       const pulse = reduced.matches ? age >= 0 && age < .65 :
         (age >= 0 && age < .16) || (age >= .45 && age < .61);
-      signalLight.material.opacity = pulse ? 1 : .15;
+      signalLight.material.opacity = (pulse ? 1 : .15)*journeyOpacity;
       signalLight.scale.setScalar(pulse ? 1.25 : 1);
     }
     if (planet && !paused && !reduced.matches) planet.rotation.y += dt * 0.012;
@@ -435,6 +449,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
       chaseWing = normalize(wing.scene, 1.6);
       ties = [normalize(tie.scene, 0.85), normalize(tie.scene.clone(true), 0.85)];
       fleet.add(...ties, chaseWing);
+      applyContentOpacity();
     })
     .catch((error) => console.warn("Distant chase models unavailable:", error));
   let falconPromise;
@@ -458,6 +473,14 @@ export async function createScene({ container, target, reduced, onStatus }) {
       worldAt(-.40,.56,85),worldAt(.03,.40,125),worldAt(.26,.37,170),
       worldAt(.26,.54,215),worldAt(-.12,.76,285),worldAt(-.24,.95,360),
     ],false,'centripetal');
+    approach.v2.copy(pickupPoint).addScaledVector(departure.getTangent(0),-3);
+    approach.arcLengthDivisions=1024;approach.updateArcLengths();
+    departure.arcLengthDivisions=2048;departure.updateArcLengths();
+    const route=new THREE.CurvePath();route.add(approach);route.add(departure);
+    route.arcLengthDivisions=4096;route.updateArcLengths();
+    const approachLength=approach.getLength();
+    const timing=createFlightTiming(route.getLength(),approachLength+departure.getLength()*.13);
+    const targetOrientation=new THREE.Quaternion();
     const enginePoints=Array.from({length:17},(_,i)=>{
       const x=-2.2+i/16*4.4;
       return new THREE.Vector3(x,.08,-1.6-Math.sqrt(6.25-x*x)*.55);
@@ -488,21 +511,23 @@ export async function createScene({ container, target, reduced, onStatus }) {
           try {
           const dt=Math.min((now-prev)/1000,.05);
           if(!document.hidden)time+=dt;prev=now;
-          const approaching=time<1.8;
-          const q=approaching ? Math.min(1,time/1.8) : Math.min(1,(time-1.8)/5.6);
-          const t=approaching?q:.5*q+.5*Math.pow(Math.max(0,(q-.4)/.6),2);
-          const curve=approaching ? approach : departure;
+          const distance=timing.distanceAt(time);
+          const approaching=distance<approachLength;
+          const t=distance/route.getLength();
+          const curve=route;
           model.position.copy(curve.getPointAt(t));
           const heading=curve.getTangentAt(t).normalize();
           const right=new THREE.Vector3().crossVectors(new THREE.Vector3(0,1,0),heading).normalize();
           const up=new THREE.Vector3().crossVectors(heading,right).normalize();
-          model.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(right,up,heading));
+          targetOrientation.setFromRotationMatrix(new THREE.Matrix4().makeBasis(right,up,heading));
           const nextHeading=curve.getTangentAt(Math.min(1,t+.015)).normalize();
           const turn=new THREE.Vector3().crossVectors(heading,nextHeading).y;
           const targetBank=THREE.MathUtils.clamp(-turn*8,-.45,.45);
           bank+=(targetBank-bank)*(1-Math.exp(-dt*3));
-          model.rotateZ(bank);
-          model.visible=time<7.4;
+          targetOrientation.multiply(new THREE.Quaternion().setFromAxisAngle(forward,bank));
+          if(time<.04)model.quaternion.copy(targetOrientation);
+          else model.quaternion.slerp(targetOrientation,1-Math.exp(-dt*8));
+          model.visible=time<timing.duration;
           model.updateMatrixWorld(true);
           const tail=model.localToWorld(new THREE.Vector3(0,0,-2.8));
           if(previousTail && model.visible){
@@ -527,7 +552,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
           coreTrail.instanceColor.needsUpdate=true;glowTrail.instanceColor.needsUpdate=true;
           if(!approaching && !passed){passed=true;onPass();}
           renderer.render(scene,camera);
-          if(time>=8.4 || reduced.matches || paused){if(!passed)onPass();resolve();}
+          if(time>=timing.duration+1 || reduced.matches || paused){if(!passed)onPass();resolve();}
           else requestAnimationFrame(frame);
           } catch(error) { reject(error); }
         }
@@ -542,8 +567,10 @@ export async function createScene({ container, target, reduced, onStatus }) {
   return {
     flyDelivery,
     signalNote() { flashStarted = performance.now(); },
-    setJourney({ visible, warp, starZoom = 1, sceneScale = 1 }) {
+    setJourney({ visible, warp, starZoom = 1, sceneScale = 1, sceneOpacity = 1 }) {
       chapterVisible = visible;
+      journeyOpacity=sceneOpacity;
+      applyContentOpacity();
       content.visible = visible;
       content.scale.set(sceneScale,sceneScale,1);
       stars.scale.set(starZoom,starZoom,1);

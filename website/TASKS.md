@@ -72,3 +72,11 @@
 - [x] Remove blue wash; thicken/brighten peak white streaks.
 - [x] Zoom scene 2 during departure; fade and recede final crawl into depth.
 - [ ] GPU/visual confirmation from the next user recording.
+
+## Transition blending and flight timing
+- [x] Streak onset overlaps star push-in in both crossings.
+- [x] Arrival opacity and zoom-out overlap streak slowdown.
+- [x] Remove scene-2 model-scale snap before streaks.
+- [x] Joined Falcon timing/heading through pickup; progressive acceleration after turn.
+- [x] 15 automated checks, two builds and finite/camera-visible flight smoke check.
+- [ ] User recording to confirm the new visual pacing.

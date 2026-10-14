@@ -35,7 +35,7 @@ export function createJourney({ scene, reduced, onChange }) {
     lastUnits = units;
     galaxy.dataset.chapter = s.chapter;
     opening.hidden = reduced.matches ? s.chapter !== "intro" : units >= CHAPTERS.enterEnd;
-    farewell.hidden = reduced.matches ? s.chapter !== "farewell" : units < CHAPTERS.leaveEnd-.08;
+    farewell.hidden = reduced.matches ? s.chapter !== "farewell" : s.farewellOpacity <= 0;
     if (reduced.matches) {
       intro.progress(0);
       outro.progress(0);
@@ -44,9 +44,10 @@ export function createJourney({ scene, reduced, onChange }) {
     } else {
       intro.progress(s.intro, true);
       outro.progress(s.farewell, true);
+      gsap.set("#farewell-crawl",{opacity:s.farewellOpacity});
     }
     warp.style.opacity = String(s.warp * 0.94);
-    scene?.setJourney({ visible: s.sceneVisible, warp: s.warp, starZoom:s.starZoom, sceneScale:s.sceneScale });
+    scene?.setJourney({ visible: s.sceneVisible, warp: s.warp, starZoom:s.starZoom, sceneScale:s.sceneScale, sceneOpacity:s.sceneOpacity });
     if (current !== s.chapter) {
       current = s.chapter;
       onChange(s.chapter);

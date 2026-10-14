@@ -8,10 +8,13 @@ export function journeyState(units,reduced=false){
     ? units<CHAPTERS.enterEnd?'intro':units<(CHAPTERS.leaveStart+CHAPTERS.leaveEnd)/2?'galaxy':'farewell'
     : units<CHAPTERS.enterStart?'intro':units<CHAPTERS.enterEnd?'transition':units<CHAPTERS.leaveStart?'galaxy':units<CHAPTERS.leaveEnd?'transition':'farewell';
   const phase=enter>0&&enter<1?enter:leave>0&&leave<1?leave:0;
-  const warp=reduced||phase<=.2||phase>=.8?0:phase<.6?smooth((phase-.2)/.4):1-smooth((phase-.6)/.2);
-  const starZoom=reduced?1:1+.65*(phase<.2?smooth(phase/.2):phase<.8?1:1-smooth((phase-.8)/.2));
-  return {chapter,warp,starZoom,
-    sceneScale:reduced?1:enter>=.8&&enter<1?.82+.18*smooth((enter-.8)/.2):leave>0&&leave<.2?1+.35*smooth(leave/.2):1,
-    sceneVisible:reduced?chapter==='galaxy':units>=CHAPTERS.enterStart+.8*(CHAPTERS.enterEnd-CHAPTERS.enterStart)&&units<CHAPTERS.leaveStart+.4*(CHAPTERS.leaveEnd-CHAPTERS.leaveStart),
-    intro:clamp(units/.72),farewell:clamp((units-(CHAPTERS.leaveEnd-.08))/(CHAPTERS.end-(CHAPTERS.leaveEnd-.08)))};
+  // The stages overlap: streaks emerge during push-in; arrival starts during slowdown.
+  const warp=reduced||phase<=.04||phase>=.98?0:phase<.58?smooth((phase-.04)/.54):1-smooth((phase-.58)/.40);
+  const starZoom=reduced?1:1+.65*(phase<.24?smooth(phase/.24):phase<.64?1:1-smooth((phase-.64)/.36));
+  const sceneOpacity=reduced?(chapter==='galaxy'?1:0):smooth((enter-.60)/.34)*(1-smooth((leave-.12)/.43));
+  return {chapter,warp,starZoom,sceneOpacity,
+    sceneScale:reduced?1:enter>=.6&&enter<1?.82+.18*smooth((enter-.6)/.4):leave>0&&leave<.55?1+.35*smooth(leave/.24):1,
+    sceneVisible:sceneOpacity>0,
+    farewellOpacity:reduced?(chapter==='farewell'?1:0):smooth((leave-.60)/.34),
+    intro:clamp(units/.72),farewell:clamp((units-(CHAPTERS.leaveStart+.6*(CHAPTERS.leaveEnd-CHAPTERS.leaveStart)))/(CHAPTERS.end-(CHAPTERS.leaveStart+.6*(CHAPTERS.leaveEnd-CHAPTERS.leaveStart))))};
 }
