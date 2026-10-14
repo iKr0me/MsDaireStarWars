@@ -61,3 +61,5 @@
 #galaxy .collection-toggle strong,#galaxy .collection-toggle .small-heart,#galaxy .collection-toggle .chevron { color:#00c9f5; }
 
 .composer form { backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+
+.composer.delivering { background:transparent; }

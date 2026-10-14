@@ -95,7 +95,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
         float length=(.003+pow(progress,3.)*.78)*strength;
         vec2 direction=vec2(cos(angle),sin(angle));
         vec2 normal=vec2(-direction.y,direction.x);
-        float width=.0006+pow(progress,2.)*.005;
+        float width=(.0006+pow(progress,2.)*.005)*(1.+strength*strength*2.2);
         vec2 p=direction*(radius+position.y*length)+normal*position.x*width;
         p.x/=aspect;
         gl_Position=vec4(p*2.,0.,1.);
@@ -106,25 +106,14 @@ export async function createScene({ container, target, reduced, onStatus }) {
     fragmentShader:`uniform float strength;varying float side;varying float end;varying float fade;
       void main(){
         float glow=exp(-side*side*5.);
-        float core=1.-smoothstep(.08,.26,abs(side));
+        float core=1.-smoothstep(.12,.45,abs(side));
         float taper=smoothstep(0.,.16,end)*(1.-smoothstep(.86,1.,end));
-        vec3 color=vec3(.1,.36,.65)*glow*.5+vec3(.82,.95,1.)*core;
+        vec3 color=vec3(.1,.36,.65)*glow*.5+vec3(.95,.98,1.)*core*(1.+strength*.7);
         gl_FragColor=vec4(color,strength*fade*taper*max(glow*.65,core));
       }`,
   });
   const tunnel=new THREE.Mesh(tunnelGeometry,tunnelMaterial);
   tunnel.frustumCulled=false;tunnel.renderOrder=40;tunnel.visible=false;scene.add(tunnel);
-  const tunnelBackdropMaterial=new THREE.ShaderMaterial({
-    transparent:true,depthTest:false,depthWrite:false,
-    uniforms:{strength:{value:0},aspect:{value:1}},
-    vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}`,
-    fragmentShader:`varying vec2 vUv;uniform float strength;uniform float aspect;
-      void main(){vec2 p=(vUv-.5)*vec2(aspect,1.);float r=length(p);
-        float glow=smoothstep(.045,.3,r);
-        gl_FragColor=vec4(vec3(.015,.035,.065)*glow,strength*.95);}`,
-  });
-  const tunnelBackdrop=new THREE.Mesh(new THREE.PlaneGeometry(2,2),tunnelBackdropMaterial);
-  tunnelBackdrop.frustumCulled=false;tunnelBackdrop.renderOrder=39;tunnelBackdrop.visible=false;scene.add(tunnelBackdrop);
   let chapterVisible = false;
   const fleet = new THREE.Group();
   fleet.visible = false;
@@ -360,7 +349,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
       bolt.group.visible = chapterVisible && bolt.life>0 && !reduced.matches;
     }
     updateTarget();
-    renderer.render(scene, camera);
+    if (!deliveryActive) renderer.render(scene, camera);
   }
   function visibility() {
     if (document.hidden) {
@@ -449,22 +438,17 @@ export async function createScene({ container, target, reduced, onStatus }) {
     })
     .catch((error) => console.warn("Distant chase models unavailable:", error));
   let falconPromise;
+  let deliveryActive=false;
+  falconPromise=loader.loadAsync('/models/millennium_falcon.glb').then(g=>normalize(g.scene,8));
+  falconPromise.catch(()=>{falconPromise=null;});
   async function flyDelivery(onPass, pickup = {x:width/2,y:height/2}) {
     if (paused || reduced.matches || !available) { onPass(); return; }
     falconPromise ??= loader.loadAsync('/models/millennium_falcon.glb').then(g=>normalize(g.scene,8));
     let model;
-    try {model=(await falconPromise).clone(true);} catch(e){falconPromise=null;onPass();return;}
-    // The delivery has its own transparent canvas above the HTML form; no background blur.
-    const deliveryScene=new THREE.Scene();
-    deliveryScene.add(model,new THREE.HemisphereLight(0xdde8ff,0x101018,0.6),sun.clone(),fill.clone());
-    const deliveryCamera=camera.clone();
-    const deliveryRenderer=new THREE.WebGLRenderer({alpha:true,antialias:true});
-    deliveryRenderer.setPixelRatio(Math.min(devicePixelRatio,1.25));
-    deliveryRenderer.setSize(width,height);
-    deliveryRenderer.toneMapping=THREE.ACESFilmicToneMapping;
-    const canvas=deliveryRenderer.domElement;
-    Object.assign(canvas.style,{position:'absolute',inset:'0',width:'100%',height:'100%',zIndex:'30',pointerEvents:'none'});
-    container.parentElement.append(canvas);
+    try {model=(await falconPromise).clone(true);} catch(e){falconPromise=null;throw new Error('The Falcon could not load. Please try again.');}
+    // Reuse the proven scene renderer instead of creating another WebGL context.
+    const deliveryScene=new THREE.Group();
+    deliveryScene.add(model);scene.add(deliveryScene);deliveryActive=true;
     const pickupPoint=worldAt(pickup.x/width*2-1,1-pickup.y/height*2,20);
     const approach=new THREE.CubicBezierCurve3(worldAt(1.7,-.1,15),worldAt(.9,.03,16),
       pickupPoint.clone().add(new THREE.Vector3(3,0,0)),pickupPoint);
@@ -498,9 +482,10 @@ export async function createScene({ container, target, reduced, onStatus }) {
     const dummy=new THREE.Object3D(), direction=new THREE.Vector3(), fadeColor=new THREE.Color();
     let trailIndex=0, previousTail;
     try {
-      await new Promise(resolve=>{
+      await new Promise((resolve,reject)=>{
         let time=0, prev=performance.now(), passed=false, bank=0;
         function frame(now){
+          try {
           const dt=Math.min((now-prev)/1000,.05);
           if(!document.hidden)time+=dt;prev=now;
           const approaching=time<1.8;
@@ -541,15 +526,16 @@ export async function createScene({ container, target, reduced, onStatus }) {
           coreTrail.instanceMatrix.needsUpdate=true;glowTrail.instanceMatrix.needsUpdate=true;
           coreTrail.instanceColor.needsUpdate=true;glowTrail.instanceColor.needsUpdate=true;
           if(!approaching && !passed){passed=true;onPass();}
-          deliveryRenderer.render(deliveryScene,deliveryCamera);
+          renderer.render(scene,camera);
           if(time>=8.4 || reduced.matches || paused){if(!passed)onPass();resolve();}
           else requestAnimationFrame(frame);
+          } catch(error) { reject(error); }
         }
         requestAnimationFrame(frame);
       });
     } finally {
-      canvas.remove();engineGeometry.dispose();engineGlowGeometry.dispose();engineMaterial.dispose();engineGlowMaterial.dispose();coreGeometry.dispose();glowGeometry.dispose();coreMaterial.dispose();glowMaterial.dispose();
-      deliveryRenderer.dispose();deliveryRenderer.forceContextLoss();
+      scene.remove(deliveryScene);deliveryActive=false;engineGeometry.dispose();engineGlowGeometry.dispose();engineMaterial.dispose();engineGlowMaterial.dispose();coreGeometry.dispose();glowGeometry.dispose();coreMaterial.dispose();glowMaterial.dispose();
+
     }
   }
 
@@ -562,9 +548,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
       content.scale.set(sceneScale,sceneScale,1);
       stars.scale.set(starZoom,starZoom,1);
       const amount = reduced.matches ? 0 : warp;
-      tunnelBackdrop.visible = amount > 0.01;
-      tunnelBackdropMaterial.uniforms.strength.value = amount;
-      tunnelBackdropMaterial.uniforms.aspect.value = width/height;
+
       tunnel.visible = amount > 0.01;
       tunnelMaterial.uniforms.strength.value = amount;
       tunnelMaterial.uniforms.aspect.value = width/height;

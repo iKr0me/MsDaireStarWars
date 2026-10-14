@@ -14,6 +14,7 @@ test('five warp stages increase count/length before slowing and settling',()=>{
  assert.ok(at(.6).warp>.99);assert.ok(at(.7).warp<at(.6).warp);
  assert.equal(at(.9).warp,0);assert.ok(at(.9).starZoom<at(.6).starZoom);
  assert.ok(at(.9).sceneScale<1);assert.equal(at(1).sceneScale,1);
+ assert.ok(at(.1,C.leaveStart,C.leaveEnd).sceneScale>1);
  for(const p of [.1,.35,.55,.6,.7,.9])assert.ok(Math.abs(at(p).warp-at(p,C.leaveStart,C.leaveEnd).warp)<1e-10);
 });
 test('both crossings stay static and readable with reduced motion',()=>{

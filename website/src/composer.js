@@ -44,6 +44,7 @@ export function createComposer({ demo, reduced, scene, onLock, onDone }) {
   form.addEventListener('submit',async e=>{
     e.preventDefault(); if(sending || !demo || !validate().valid)return;
     sending=true;validate(); error.textContent='';
+    let pendingFingerprint=null;
     try {
       const text=JSON.stringify([name.value.trim(),message.value.trim()]);
       const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text));
@@ -51,6 +52,7 @@ export function createComposer({ demo, reduced, scene, onLock, onDone }) {
       let ledger=[];try {ledger=JSON.parse(localStorage.getItem(ledgerKey)||'[]');}catch{}
       const allowance=previewAllowance(ledger,fingerprint,Date.now());
       if(!allowance.allowed)throw new Error(allowance.reason);
+      pendingFingerprint=fingerprint;
       // Preview records only hashes/times, never a public note or photo.
       localStorage.setItem(ledgerKey,JSON.stringify([...allowance.recent,{fingerprint,at:Date.now()}]));
       form.inert=true;
@@ -63,6 +65,7 @@ export function createComposer({ demo, reduced, scene, onLock, onDone }) {
         });
         orbBob=gsap.to(orb,{scale:1.12,duration:.65,repeat:-1,yoyo:true,ease:'sine.inOut'});
       }
+      root.classList.add("delivering");
       const box=orb.getBoundingClientRect();
       const pickup={x:box.left+box.width/2,y:box.top+box.height/2};
       const passed=()=>{orbBob?.kill();gsap.set(orb,{opacity:0});root.hidden=true;};
@@ -71,8 +74,13 @@ export function createComposer({ demo, reduced, scene, onLock, onDone }) {
       form.reset(); if(url)URL.revokeObjectURL(url);url=null;preview.hidden=true;
       active=false;onLock(false);onDone('Delivery preview complete. No note was sent or published.');
       previous?.focus({preventScroll:true});
-    }catch(e){orbBob?.kill();gsap.set(form,{scale:1,opacity:1,borderRadius:8});gsap.set(orb,{opacity:0});root.hidden=false;error.textContent=e.message;}
-    finally {sending=false;form.inert=false;validate(false);}
+    }catch(e){
+      if(pendingFingerprint){try {
+        const ledger=JSON.parse(localStorage.getItem(ledgerKey)||'[]');
+        localStorage.setItem(ledgerKey,JSON.stringify(ledger.filter(x=>x.fingerprint!==pendingFingerprint)));
+      } catch {}}
+      orbBob?.kill();gsap.set(form,{scale:1,opacity:1,borderRadius:8});gsap.set(orb,{opacity:0});root.hidden=false;error.textContent=e.message;}
+    finally {root.classList.remove("delivering");sending=false;form.inert=false;validate(false);}
   });
   root.querySelector('#submission-mode').textContent=demo
     ? 'Demo: preview the delivery. Nothing will be sent or published.'

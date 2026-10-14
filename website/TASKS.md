@@ -65,3 +65,10 @@
 - [x] Blur only inside the form panel; whole-panel orb compaction.
 - [x] Drawn Falcon course, upright bank, later acceleration and wider rear engine glow/trail.
 - [ ] User visual confirmation of the new choreography and engine placement.
+
+## Visibility/warp follow-up
+- [x] Shared-renderer Falcon delivery, preloading and recoverable errors.
+- [x] Actual flight-function/model-geometry CPU smoke check (444 camera-visible frames).
+- [x] Remove blue wash; thicken/brighten peak white streaks.
+- [x] Zoom scene 2 during departure; fade and recede final crawl into depth.
+- [ ] GPU/visual confirmation from the next user recording.

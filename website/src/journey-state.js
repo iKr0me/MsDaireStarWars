@@ -11,7 +11,7 @@ export function journeyState(units,reduced=false){
   const warp=reduced||phase<=.2||phase>=.8?0:phase<.6?smooth((phase-.2)/.4):1-smooth((phase-.6)/.2);
   const starZoom=reduced?1:1+.65*(phase<.2?smooth(phase/.2):phase<.8?1:1-smooth((phase-.8)/.2));
   return {chapter,warp,starZoom,
-    sceneScale:reduced?1:enter>=.8&&enter<1?.82+.18*smooth((enter-.8)/.2):1,
+    sceneScale:reduced?1:enter>=.8&&enter<1?.82+.18*smooth((enter-.8)/.2):leave>0&&leave<.2?1+.35*smooth(leave/.2):1,
     sceneVisible:reduced?chapter==='galaxy':units>=CHAPTERS.enterStart+.8*(CHAPTERS.enterEnd-CHAPTERS.enterStart)&&units<CHAPTERS.leaveStart+.4*(CHAPTERS.leaveEnd-CHAPTERS.leaveStart),
-    intro:clamp(units/.72),farewell:clamp((units-CHAPTERS.leaveEnd)/(CHAPTERS.end-CHAPTERS.leaveEnd))};
+    intro:clamp(units/.72),farewell:clamp((units-(CHAPTERS.leaveEnd-.08))/(CHAPTERS.end-(CHAPTERS.leaveEnd-.08)))};
 }
