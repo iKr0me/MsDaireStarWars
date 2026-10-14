@@ -243,6 +243,7 @@ try {
     target,
     reduced,
     onStatus: status,
+    onFlingSound: () => audio.playFling(),
   });
   status("");
 } catch (error) {

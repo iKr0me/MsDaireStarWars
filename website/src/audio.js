@@ -16,6 +16,14 @@ export function createAudio() {
   const music = config.music.src ? new Audio(config.music.src) : null;
   if (music) { music.loop = true; music.volume = config.music.initialVolume; music.preload = "none"; }
   let musicEnabled = false;
+  function playClip(clip) {
+    if (!enabled) return;
+    clip.currentTime = 0;
+    clip.play().catch(() => {
+      fallback.currentTime = 0;
+      fallback.play().catch(() => {});
+    });
+  }
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) music?.pause();
     else if (musicEnabled) music?.play().catch(() => {});
@@ -41,13 +49,12 @@ export function createAudio() {
       return enabled;
     },
     play() {
-      if (!enabled) return;
-      const clip = clips[index++ % clips.length];
-      clip.currentTime = 0;
-      clip.play().catch(() => {
-        fallback.currentTime = 0;
-        fallback.play().catch(() => {});
-      });
+      playClip(clips[index++ % clips.length]);
+    },
+    playFling() {
+      // Reuse the R2 sound selected by the accepted press, without advancing
+      // the alternating clip choice for the next interaction.
+      playClip(clips[(index - 1 + clips.length) % clips.length]);
     },
     stop() {
       [...clips, fallback].forEach((c) => c.pause());

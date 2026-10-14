@@ -106,6 +106,7 @@
 
 ## October 14 separate launch path
 - [x] Remove the plasma orb pickup target and hide the compacted composer before the Falcon launches.
-- [x] Start the large Falcon in the mid-right and arc above R2 rather than through his position.
+- [x] Bring the enlarged Falcon in from off-screen right, soften its first arc, and accelerate its receding scale change.
+- [x] Start R2’s reaction shortly after Falcon entrance; add three backward cartwheels and one droid beep at the tumble midpoint.
 - [x] Fling R2 down-left and farther into the background, then ease him back to his normal lane.
 - [ ] User GPU/browser visual review; browser remains blocked by the saved permission setting.

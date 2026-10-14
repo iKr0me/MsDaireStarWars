@@ -8,7 +8,7 @@ const files = {
   chase: "stylized_x-_wing_without_r2d2.glb",
   tie: "tie_fighter_-_star_wars.glb",
 };
-export async function createScene({ container, target, reduced, onStatus }) {
+export async function createScene({ container, target, reduced, onStatus, onFlingSound = () => {} }) {
   const scene = new THREE.Scene();
   const content = new THREE.Group();
   content.visible = false;
@@ -167,6 +167,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
   let hero, anchor, chestAnchor, signalLight, headPivot, planet, death;
   let headYaw = 0;
   let flashStarted = -Infinity, spinEventStarted = -Infinity, deliveryReactionStarted = -Infinity;
+  let deliveryBeepPlayed = true;
   // A near-space gust pushes R2 well behind its usual flight lane, then the
   // render loop eases it back over several seconds instead of snapping home.
   const deliveryImpulse = new THREE.Vector3(-8,-12,-28);
@@ -248,9 +249,13 @@ export async function createScene({ container, target, reduced, onStatus }) {
       const impactIn=THREE.MathUtils.smoothstep(impactAge,0,.42);
       const recovery=1-THREE.MathUtils.smoothstep(impactAge,1,9.8);
       const impact=impactIn*recovery;
+      const tumble=Number.isFinite(deliveryReactionStarted)
+        ? THREE.MathUtils.smoothstep(impactAge,0,2.6)*Math.PI*6
+        : 0;
       hero.position.x = (width < 700 ? -0.3 : -1.3) + (still ? 0 : Math.sin(t) * 0.85) + deliveryImpulse.x*impact;
       hero.position.y = baseY + (still ? 0 : Math.sin(elapsed * 0.42) * 0.7) + deliveryImpulse.y*impact;
       hero.position.z = (still ? 0 : Math.cos(t * 0.78) * 1.3) + deliveryImpulse.z*impact;
+      if(!deliveryBeepPlayed && impactAge>=1.3){deliveryBeepPlayed=true;onFlingSound();}
       if (!still) {
         const chaseAge = fleet.visible ? elapsed - chaseStart : -1;
         const gentleAge = elapsed - spinEventStarted;
@@ -262,7 +267,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
         spin += dt * (0.035 + spinVelocity);
       }
       hero.rotation.set(
-        0.08 + (still ? 0 : Math.sin(t * 0.81) * 0.12),
+        0.08 + (still ? 0 : Math.sin(t * 0.81) * 0.12) + tumble,
         -0.35 + spin,
         still ? 0 : Math.sin(t) * 0.12 + Math.sin(spin) * Math.min(spinVelocity, 0.35),
       );
@@ -469,6 +474,9 @@ export async function createScene({ container, target, reduced, onStatus }) {
     falconPromise ??= loader.loadAsync('/models/millennium_falcon.glb').then(g=>normalize(g.scene,8));
     let model;
     try {model=(await falconPromise).clone(true);} catch(e){falconPromise=null;throw new Error('The Falcon could not load. Please try again.');}
+    // Give the delivery pass a larger silhouette; perspective then carries it
+    // naturally down to a tiny speck on the long receding leg.
+    model.scale.setScalar(1.24);
     model.traverse(node=>{
       if(!node.isMesh||!node.material)return;
       const shade=material=>{
@@ -495,7 +503,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
     // Three broad Bezier sweeps keep both banks gradual while depth grows continuously.
     // Launch large from the mid-right, sweep above R2 across the middle, then
     // arc left and outward. This keeps the Falcon visually clear of the droid.
-    const first=[new THREE.Vector3(1.08,.72,10.5),new THREE.Vector3(.56,.75,13),new THREE.Vector3(-.18,.78,23),new THREE.Vector3(-.70,.50,56)];
+    const first=[new THREE.Vector3(2.05,.72,10.5),new THREE.Vector3(1.42,.78,13),new THREE.Vector3(.12,.82,23),new THREE.Vector3(-.70,.50,56)];
     const secondStart=first[3],secondControl1=first[3].clone().add(first[3].clone().sub(first[2]).multiplyScalar(.8));
     const secondControl2=new THREE.Vector3(.30,.55,120),secondEnd=new THREE.Vector3(.35,.35,155);
     const thirdControl1=secondEnd.clone().add(secondEnd.clone().sub(secondControl2).multiplyScalar(.8));
@@ -506,7 +514,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
     route.arcLengthDivisions=2048;route.updateArcLengths();
     const firstBendLength=firstBend.getLength();
     const secondTurn=firstBendLength+secondBend.getLength();
-    const timing=createFlightTiming(route.getLength(),secondTurn);
+    const timing=createFlightTiming(route.getLength(),secondTurn,40);
     const targetOrientation=new THREE.Quaternion();
     const enginePoints=Array.from({length:17},(_,i)=>{
       const x=-2.2+i/16*4.4;
@@ -606,8 +614,8 @@ export async function createScene({ container, target, reduced, onStatus }) {
           targetOrientation.setFromRotationMatrix(new THREE.Matrix4().makeBasis(right,up,heading));
           const nextHeading=curve.getTangentAt(Math.min(1,t+.015)).normalize();
           const turn=new THREE.Vector3().crossVectors(heading,nextHeading).y;
-          const targetBank=THREE.MathUtils.clamp(-turn*8,-.45,.45);
-          bank+=(targetBank-bank)*(1-Math.exp(-dt*3));
+          const targetBank=THREE.MathUtils.clamp(-turn*4.8,-.32,.32);
+          bank+=(targetBank-bank)*(1-Math.exp(-dt*2.2));
           targetOrientation.multiply(new THREE.Quaternion().setFromAxisAngle(forward,bank));
           if(time<.04)model.quaternion.copy(targetOrientation);
           else model.quaternion.slerp(targetOrientation,1-Math.exp(-dt*8));
@@ -626,7 +634,11 @@ export async function createScene({ container, target, reduced, onStatus }) {
           updateParticles(heading,dt);
           // The distant wake reaches R2's sky-lane after the Falcon has swept
           // above him; their paths stay separated in screen position and depth.
-          if(distance>=firstBendLength*.58&&!reacted){reacted=true;deliveryReactionStarted=elapsed;}
+          if(distance>=firstBendLength*.38&&!reacted){
+            reacted=true;
+            deliveryReactionStarted=elapsed;
+            deliveryBeepPlayed=false;
+          }
           renderer.render(scene,camera);
           if(time>=timing.duration+trailLifetime || reduced.matches || paused)resolve();
           else requestAnimationFrame(frame);
