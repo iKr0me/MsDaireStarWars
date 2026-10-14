@@ -7,7 +7,6 @@ export function createComposer({ demo, reduced, scene, onLock, onDone }) {
   const send=root.querySelector('[type=submit]'), counter=root.querySelector('#draft-count');
   const error=root.querySelector('#draft-status'), preview=root.querySelector('#photo-preview');
   const orb=document.createElement('div');orb.className='plasma-orb';orb.setAttribute('aria-hidden','true');root.append(orb);
-  let orbBob;
   let active=false, sending=false, url=null, previous;
   const ledgerKey='ms-daire-preview-submissions-v1';
   function validate(showError = true) {
@@ -58,19 +57,19 @@ export function createComposer({ demo, reduced, scene, onLock, onDone }) {
       form.inert=true;
       const allowMotion = !reduced.matches && !root.closest("#galaxy").classList.contains("paused");
       if (allowMotion) {
+        root.classList.add("delivering");
         await new Promise(resolve=>{
           gsap.timeline({onComplete:resolve})
             .to(form,{scale:.025,opacity:0,borderRadius:200,duration:.65,ease:'power3.inOut'},0)
-            .fromTo(orb,{scale:.2,opacity:0},{scale:1,opacity:1,duration:.4,ease:'sine.out'},.3);
+            .fromTo(orb,{scale:.2,opacity:0},{scale:1,opacity:1,duration:.34,ease:'sine.out'},.3)
+            .to(orb,{scale:.18,opacity:0,duration:.24,ease:'power2.in'},.64);
         });
-        orbBob=gsap.to(orb,{scale:1.12,duration:.65,repeat:-1,yoyo:true,ease:'sine.inOut'});
       }
-      root.classList.add("delivering");
-      const box=orb.getBoundingClientRect();
-      const pickup={x:box.left+box.width/2,y:box.top+box.height/2};
-      const passed=()=>{orbBob?.kill();gsap.set(orb,{opacity:0});root.hidden=true;};
-      if(scene?.flyDelivery && allowMotion)await scene.flyDelivery(passed,pickup);
-      else passed();
+      // The short glow is only a visual punctuation for the panel collapse.
+      // It fades before the Falcon launches and is never a pickup target.
+      gsap.set(orb,{opacity:0,scale:1});
+      root.hidden=true;
+      if(scene?.flyDelivery && allowMotion)await scene.flyDelivery();
       form.reset(); if(url)URL.revokeObjectURL(url);url=null;preview.hidden=true;
       active=false;onLock(false);onDone('Delivery preview complete. No note was sent or published.');
       previous?.focus({preventScroll:true});
@@ -79,7 +78,7 @@ export function createComposer({ demo, reduced, scene, onLock, onDone }) {
         const ledger=JSON.parse(localStorage.getItem(ledgerKey)||'[]');
         localStorage.setItem(ledgerKey,JSON.stringify(ledger.filter(x=>x.fingerprint!==pendingFingerprint)));
       } catch {}}
-      orbBob?.kill();gsap.set(form,{scale:1,opacity:1,borderRadius:8});gsap.set(orb,{opacity:0});root.hidden=false;error.textContent=e.message;}
+      gsap.set(form,{scale:1,opacity:1,borderRadius:8});gsap.set(orb,{opacity:0,scale:1});root.hidden=false;error.textContent=e.message;}
     finally {root.classList.remove("delivering");sending=false;form.inert=false;validate(false);}
   });
   root.querySelector('#submission-mode').textContent=demo

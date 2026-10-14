@@ -92,11 +92,11 @@ TIE evasion is a shallow, gradual climb with modest banking and a heading that f
 
 The heart now remains solid during flight and reveals its text on arrival without the folding-cover opening sequence. It remains heart-shaped and gently bobs while readable. Hyperspace ribbon winding was reversed to face the camera; DoubleSide is enabled as a guard against orientation changes. This addresses the invisible-streak regression shown in the supplied capture. Visual confirmation of the new changes is pending user screenshots.
 
-## Plasma pickup and staged warp
+## Composer departure and staged warp
 
 Hyperspace now separates an initial eased starfield push-in from the bright streak window, followed by a zoom-out into the next chapter. Reversing the scroll reverses those stages. Streak length increased slightly again. The journey state test checks that stars zoom before streaks and settle after them.
 
-The composer has a translucent dark backdrop that intercepts clicks without blurring the galaxy. Collection controls and gallery now share its cyan sans-serif design. A valid demo preview collapses the form into a glowing plasma orb; the Falcon crosses that exact screen position before the orb disappears. It banks to the left and returns toward the right while receding. Motion pause and reduced motion skip the pickup choreography. Actual shared submission remains unconnected.
+The composer has a translucent dark backdrop that intercepts clicks without blurring the galaxy. Collection controls and gallery now share its cyan sans-serif design. A valid demo preview contracts the form through a brief plasma-colored flash, which fades completely before the Falcon launches. The Falcon has no orb pickup or collection target. It banks across the middle and then recedes into deep space. Motion pause and reduced motion skip the flight choreography. Actual shared submission remains unconnected.
 
 R2’s head and eye meshes have a separate pivot preserving their source transforms; occasional smooth glances compensate for body orientation to face the viewer, interspersed with wandering turns. The light and note-origin marker follow that head pivot; the click target remains on the body. Visual confirmation of the new choreography remains pending screenshots.
 
@@ -106,13 +106,13 @@ A first-load audio dialog offers Keep off (outlined cyan, left) and Turn on (fil
 
 Both transitions have 1.15 viewport units of scroll travel, split into star zoom-in, sparse streak buildup, dense long streaks, deceleration, and star zoom-out. Intro zoom starts while the crawl is still visible near the top quarter. Scene 2 eases from a smaller presentation to normal during arrival. Farewell moves up and recedes on the same steep crawl plane as the opening while stopping at a readable final composition. Reversal and reduced-motion behavior remain supported.
 
-R2’s head uses a fixed angular step rate (0.8 radians/sec), facing generally forward most of the time, occasionally glancing aside, or looking toward active flyby craft before returning forward. The composer only blurs through its own translucent panel; there is no full-screen blur. It contracts as a whole into the pickup orb.
+R2’s head uses a fixed angular step rate (0.8 radians/sec), facing generally forward most of the time, occasionally glancing aside, or looking toward active flyby craft before returning forward. The composer only blurs through its own translucent panel; there is no full-screen blur. It contracts as a whole before the flight begins.
 
-The Falcon path follows the supplied drawing: pickup from the right, up-left sweep, broad bend to the right, and final upper-left climb deep into space. A world-up orientation with bank limited to about 26 degrees prevents upside-down flips. The private annotated source screenshot remains in Downloads and is not copied into the publishable repository.
+The Falcon path follows the supplied drawing: a large launch from mid-right sweeps above R2 through the middle, then makes a broad leftward bank before receding into deep space. A world-up orientation with bank limited to about 26 degrees prevents upside-down flips. The private annotated source screenshot remains in Downloads and is not copied into the publishable repository.
 
 ## Falcon visibility and transition correction
 
-Falcon delivery now reuses the main scene renderer instead of allocating a second WebGL context/canvas. Its existing GLB is preloaded; failed loading and animation frames reject with an error and restore the composer rather than silently completing or leaving an orb. Failed previews remove their pending duplicate fingerprint so the same draft can be retried. A CPU smoke run executed the real delivery function with supplied model geometry and a renderer stand-in: one pickup, 444 camera-visible frames and finite bounds throughout, using one renderer. This checks flight geometry/control flow, not GPU pixels. Browser visual confirmation is still pending.
+Falcon delivery reuses the main scene renderer instead of allocating a second WebGL context/canvas. Its existing GLB is preloaded; failed loading and animation frames reject with an error and restore the composer rather than silently completing. Failed previews remove their pending duplicate fingerprint so the same draft can be retried. A prior CPU smoke run executed the delivery function with supplied model geometry and a renderer stand-in, checking camera visibility and finite bounds. The current path has since been revised to launch from mid-right without an orb pickup. Browser visual confirmation is still pending.
 
 The blue hyperspace backdrop shader was removed completely. White streak widths and bright cores increase at peak intensity. The scene-2 departure now zooms its objects as well as the stars before streak buildup. Farewell opacity fades in and the text travels back along Z with less vertical translation.
 
@@ -120,7 +120,7 @@ The blue hyperspace backdrop shader was removed completely. White streak widths 
 
 Streaks begin alongside the star push-in and peak near 55% of each crossing before fading under the incoming scene. Scene 2’s materials fade away without a visible scale reset. Material opacity/depth-write settings are restored on arrival and support reverse scrolling.
 
-Falcon approach/departure tangents are matched at pickup. Earlier timing used a joined route and gradual acceleration after the first major turn; the October 14 update below supersedes that timing and route.
+An earlier route matched Falcon approach/departure tangents at the orb pickup. The current version has no pickup; it begins with the mid-right sweep described below.
 
 ## October 14 flight and hyperspace refinement
 
@@ -132,10 +132,10 @@ Production and demo builds pass after these changes. The browser preview remains
 
 ## October 14 Falcon flyby polish
 
-The delivery now starts close to the camera from the lower-right, where the large Falcon crops against the screen edge before crossing the note pickup and continuing left into its existing deep-space curves. Its materials receive slightly darker, rougher shading, and the scene fill light is lower for stronger contrast. The blue wake now fades along its length and lasts longer; small blue-white particles drift away from the engine trail.
+The earlier pickup version started close to the camera from the lower-right and crossed the plasma target. Its Falcon shading, fading blue wake and drifting particles remain in use; the pickup route was replaced by the later mid-right launch described below.
 
-When the Falcon crosses the note pickup, R2 gets a gradual spin and a short positional push upward and deeper into the scene. The droid then eases back to its normal bobbing path over several seconds. The demo build succeeds. The browser preview is still unavailable, so exact framing and shading need a visual check from the user.
+During the earlier pickup version, R2 got a short upward push. The latest route below instead moves him down-left and much deeper into the scene before easing him back. The browser preview is still unavailable, so exact framing and shading need a visual check from the user.
 
 ## October 14 depth and wake refinement
 
-The delivery Falcon now enters nearer the camera on a centered path across the mid-right, making its close pass substantially larger while the following route keeps receding into deep space. Its wake uses saturated neon blue with a broader additive glow and a few sparse, softly flickering blue-white particles. At the pass, R2 is pushed much farther behind the scene and gradually returns to its usual path over about eight seconds, with its spin reaction eased across the event. Review the close-pass crop and the depth of R2 in the local browser; GPU visual review is still unavailable here.
+The Falcon now launches large from the mid-right, sweeps above R2 through the middle, and banks away without targeting or crossing the plasma flash. The composer and flash disappear before launch. As the Falcon passes nearby on its separate path, R2 is flung down-left and much farther into the background, then eases back to his usual lane over about ten seconds. The wake stays neon blue with sparse, softly flickering particles. Review the path separation, droid scale and return in the local browser; GPU visual review is still unavailable here.

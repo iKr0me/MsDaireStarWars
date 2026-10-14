@@ -50,7 +50,7 @@
 - [x] Eased starfield zoom, delayed longer streaks, and zoom-out on arrival.
 - [x] Translucent composer/backdrop with blocked background input.
 - [x] Consistent cyan collection controls and gallery.
-- [x] Plasma form compaction and pickup at the Falcon’s crossing.
+- [x] Compact the form through a short plasma flash that disappears before Falcon launch; no orb pickup.
 - [x] Extended bank-and-recede Falcon route with one-second blue trail decay.
 - [x] Occasional independent head wandering and viewer glances.
 - [x] Tests and local production/demo builds.
@@ -77,7 +77,7 @@
 - [x] Streak onset overlaps star push-in in both crossings.
 - [x] Arrival opacity and zoom-out overlap streak slowdown.
 - [x] Remove scene-2 model-scale snap before streaks.
-- [x] Joined Falcon timing/heading through pickup; progressive acceleration after turn.
+- [x] Smooth Falcon curve timing and progressive acceleration after the turn.
 - [x] 15 automated checks, two builds and finite/camera-visible flight smoke check.
 - [ ] User recording to confirm the new visual pacing.
 
@@ -91,7 +91,7 @@
 - [ ] User GPU/browser visual review; browser remains blocked by the saved permission setting.
 
 ## October 14 Falcon flyby polish
-- [x] Start the Falcon very close across the lower-right, then pass the pickup and continue left along its receding route.
+- [x] Earlier pickup route, superseded by the mid-right launch and separate R2 reaction below.
 - [x] Deepen Falcon material and scene lighting contrast.
 - [x] Fade the engine ribbon along its tail and add drifting blue-white particles.
 - [x] Give R2 a smooth spin and depth drift at the Falcon’s pass, then return it gradually to its normal path.
@@ -102,4 +102,10 @@
 - [x] Enlarge the Falcon’s close approach across the right side while preserving its continuous, receding route.
 - [x] Push R2 farther back at the pass and ease it home over a longer interval.
 - [x] Shift the engine wake to a broader neon-blue glow and reduce particles to a sparse, gentle sparkle.
+- [ ] User GPU/browser visual review; browser remains blocked by the saved permission setting.
+
+## October 14 separate launch path
+- [x] Remove the plasma orb pickup target and hide the compacted composer before the Falcon launches.
+- [x] Start the large Falcon in the mid-right and arc above R2 rather than through his position.
+- [x] Fling R2 down-left and farther into the background, then ease him back to his normal lane.
 - [ ] User GPU/browser visual review; browser remains blocked by the saved permission setting.

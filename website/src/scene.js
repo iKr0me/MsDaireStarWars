@@ -169,7 +169,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
   let flashStarted = -Infinity, spinEventStarted = -Infinity, deliveryReactionStarted = -Infinity;
   // A near-space gust pushes R2 well behind its usual flight lane, then the
   // render loop eases it back over several seconds instead of snapping home.
-  const deliveryImpulse = new THREE.Vector3(1.05,0.78,-12.5);
+  const deliveryImpulse = new THREE.Vector3(-8,-12,-28);
   let spin = 0, spinVelocity = 0, nextSpin = 18;
   const baseCameraRotation = camera.rotation.clone();
   let paused = false,
@@ -246,7 +246,7 @@ export async function createScene({ container, target, reduced, onStatus }) {
       const baseY = width < 700 ? -1.1 : -1.5;
       const impactAge=elapsed-deliveryReactionStarted;
       const impactIn=THREE.MathUtils.smoothstep(impactAge,0,.42);
-      const recovery=1-THREE.MathUtils.smoothstep(impactAge,.85,8.4);
+      const recovery=1-THREE.MathUtils.smoothstep(impactAge,1,9.8);
       const impact=impactIn*recovery;
       hero.position.x = (width < 700 ? -0.3 : -1.3) + (still ? 0 : Math.sin(t) * 0.85) + deliveryImpulse.x*impact;
       hero.position.y = baseY + (still ? 0 : Math.sin(elapsed * 0.42) * 0.7) + deliveryImpulse.y*impact;
@@ -464,8 +464,8 @@ export async function createScene({ container, target, reduced, onStatus }) {
   let deliveryActive=false;
   falconPromise=loader.loadAsync('/models/millennium_falcon.glb').then(g=>normalize(g.scene,8));
   falconPromise.catch(()=>{falconPromise=null;});
-  async function flyDelivery(onPass, pickup = {x:width/2,y:height/2}) {
-    if (paused || reduced.matches || !available) { onPass(); return; }
+  async function flyDelivery() {
+    if (paused || reduced.matches || !available) return;
     falconPromise ??= loader.loadAsync('/models/millennium_falcon.glb').then(g=>normalize(g.scene,8));
     let model;
     try {model=(await falconPromise).clone(true);} catch(e){falconPromise=null;throw new Error('The Falcon could not load. Please try again.');}
@@ -483,7 +483,6 @@ export async function createScene({ container, target, reduced, onStatus }) {
     // Reuse the proven scene renderer instead of creating another WebGL context.
     const deliveryScene=new THREE.Group();
     deliveryScene.add(model);scene.add(deliveryScene);deliveryActive=true;
-    const pickupNdc=new THREE.Vector3(pickup.x/width*2-1,1-pickup.y/height*2,20);
     const screenCurve=controls=>{
       const bezier=new THREE.CubicBezierCurve3(...controls);
       return new class extends THREE.Curve {
@@ -494,19 +493,19 @@ export async function createScene({ container, target, reduced, onStatus }) {
       }();
     };
     // Three broad Bezier sweeps keep both banks gradual while depth grows continuously.
-    const first=[pickupNdc,new THREE.Vector3(-.25,-.02,30),new THREE.Vector3(-.72,.30,44),new THREE.Vector3(-.70,.50,56)];
+    // Launch large from the mid-right, sweep above R2 across the middle, then
+    // arc left and outward. This keeps the Falcon visually clear of the droid.
+    const first=[new THREE.Vector3(1.08,.72,10.5),new THREE.Vector3(.56,.75,13),new THREE.Vector3(-.18,.78,23),new THREE.Vector3(-.70,.50,56)];
     const secondStart=first[3],secondControl1=first[3].clone().add(first[3].clone().sub(first[2]).multiplyScalar(.8));
     const secondControl2=new THREE.Vector3(.30,.55,120),secondEnd=new THREE.Vector3(.35,.35,155);
     const thirdControl1=secondEnd.clone().add(secondEnd.clone().sub(secondControl2).multiplyScalar(.8));
-    const approachControl2=pickupNdc.clone().sub(first[1].clone().sub(pickupNdc).multiplyScalar(.8));
-    const approach=screenCurve([new THREE.Vector3(1.24,-.05,4.35),new THREE.Vector3(.98,-.04,5.1),approachControl2,pickupNdc]);
     const firstBend=screenCurve(first);
     const secondBend=screenCurve([secondStart,secondControl1,secondControl2,secondEnd]);
     const thirdBend=screenCurve([secondEnd,thirdControl1,new THREE.Vector3(-.12,.85,300),new THREE.Vector3(-.25,.96,420)]);
-    const route=new THREE.CurvePath();route.add(approach);route.add(firstBend);route.add(secondBend);route.add(thirdBend);
+    const route=new THREE.CurvePath();route.add(firstBend);route.add(secondBend);route.add(thirdBend);
     route.arcLengthDivisions=2048;route.updateArcLengths();
-    const approachLength=approach.getLength();
-    const secondTurn=approachLength+firstBend.getLength()+secondBend.getLength();
+    const firstBendLength=firstBend.getLength();
+    const secondTurn=firstBendLength+secondBend.getLength();
     const timing=createFlightTiming(route.getLength(),secondTurn);
     const targetOrientation=new THREE.Quaternion();
     const enginePoints=Array.from({length:17},(_,i)=>{
@@ -592,13 +591,12 @@ export async function createScene({ container, target, reduced, onStatus }) {
     };
     try {
       await new Promise((resolve,reject)=>{
-        let time=0, prev=performance.now(), passed=false, bank=0;
+        let time=0, prev=performance.now(), reacted=false, bank=0;
         function frame(now){
           try {
           const dt=Math.min((now-prev)/1000,.05);
           if(!document.hidden)time+=dt;prev=now;
           const distance=timing.distanceAt(time);
-          const approaching=distance<approachLength;
           const t=distance/route.getLength();
           const curve=route;
           model.position.copy(curve.getPointAt(t));
@@ -626,9 +624,11 @@ export async function createScene({ container, target, reduced, onStatus }) {
           while(trailSamples.length>1&&time-trailSamples[0].at>trailLifetime)trailSamples.shift();
           writeRibbon(coreTrail,.025);writeRibbon(glowTrail,.34);
           updateParticles(heading,dt);
-          if(!approaching && !passed){passed=true;deliveryReactionStarted=elapsed;onPass();}
+          // The distant wake reaches R2's sky-lane after the Falcon has swept
+          // above him; their paths stay separated in screen position and depth.
+          if(distance>=firstBendLength*.58&&!reacted){reacted=true;deliveryReactionStarted=elapsed;}
           renderer.render(scene,camera);
-          if(time>=timing.duration+trailLifetime || reduced.matches || paused){if(!passed)onPass();resolve();}
+          if(time>=timing.duration+trailLifetime || reduced.matches || paused)resolve();
           else requestAnimationFrame(frame);
           } catch(error) { reject(error); }
         }
