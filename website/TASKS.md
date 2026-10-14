@@ -110,3 +110,9 @@
 - [x] Start R2’s reaction shortly after Falcon entrance; add three backward cartwheels and one droid beep at the tumble midpoint.
 - [x] Fling R2 down-left and farther into the background, then ease him back to his normal lane.
 - [ ] User GPU/browser visual review; browser remains blocked by the saved permission setting.
+
+## October 14 Falcon and R2 timing pass
+- [x] Increase the Falcon’s launch size and overall flight speed while retaining its smooth route and deep-space scale change.
+- [x] Start R2’s fling at the Falcon’s first on-screen entry from the right.
+- [x] Slow the same down-left/deep-space displacement across the existing three backward cartwheels, preserving the mid-tumble beep and gradual return.
+- [ ] User GPU/browser visual review; browser remains blocked by the saved permission setting.

@@ -246,8 +246,10 @@ export async function createScene({ container, target, reduced, onStatus, onFlin
       const still = paused || reduced.matches;
       const baseY = width < 700 ? -1.1 : -1.5;
       const impactAge=elapsed-deliveryReactionStarted;
-      const impactIn=THREE.MathUtils.smoothstep(impactAge,0,.42);
-      const recovery=1-THREE.MathUtils.smoothstep(impactAge,1,9.8);
+      // Let the droid travel the same full distance, but build that motion
+      // over the three cartwheels before easing him back to his normal lane.
+      const impactIn=THREE.MathUtils.smoothstep(impactAge,0,3.0);
+      const recovery=1-THREE.MathUtils.smoothstep(impactAge,3.1,12.5);
       const impact=impactIn*recovery;
       const tumble=Number.isFinite(deliveryReactionStarted)
         ? THREE.MathUtils.smoothstep(impactAge,0,2.6)*Math.PI*6
@@ -476,7 +478,7 @@ export async function createScene({ container, target, reduced, onStatus, onFlin
     try {model=(await falconPromise).clone(true);} catch(e){falconPromise=null;throw new Error('The Falcon could not load. Please try again.');}
     // Give the delivery pass a larger silhouette; perspective then carries it
     // naturally down to a tiny speck on the long receding leg.
-    model.scale.setScalar(1.24);
+    model.scale.setScalar(1.45);
     model.traverse(node=>{
       if(!node.isMesh||!node.material)return;
       const shade=material=>{
@@ -514,7 +516,7 @@ export async function createScene({ container, target, reduced, onStatus, onFlin
     route.arcLengthDivisions=2048;route.updateArcLengths();
     const firstBendLength=firstBend.getLength();
     const secondTurn=firstBendLength+secondBend.getLength();
-    const timing=createFlightTiming(route.getLength(),secondTurn,40);
+    const timing=createFlightTiming(route.getLength(),secondTurn,48);
     const targetOrientation=new THREE.Quaternion();
     const enginePoints=Array.from({length:17},(_,i)=>{
       const x=-2.2+i/16*4.4;
@@ -632,9 +634,10 @@ export async function createScene({ container, target, reduced, onStatus, onFlin
           while(trailSamples.length>1&&time-trailSamples[0].at>trailLifetime)trailSamples.shift();
           writeRibbon(coreTrail,.025);writeRibbon(glowTrail,.34);
           updateParticles(heading,dt);
-          // The distant wake reaches R2's sky-lane after the Falcon has swept
-          // above him; their paths stay separated in screen position and depth.
-          if(distance>=firstBendLength*.38&&!reacted){
+          // Start R2's reaction as soon as the Falcon's center crosses the
+          // screen edge from the right, so the fling visibly begins with the flyby.
+          const falconScreenX=model.position.clone().project(camera).x;
+          if(falconScreenX<=1.65&&!reacted){
             reacted=true;
             deliveryReactionStarted=elapsed;
             deliveryBeepPlayed=false;
