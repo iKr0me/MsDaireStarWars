@@ -84,18 +84,17 @@ function collection(open) {
   syncScrollLock();
 }
 function renderCollection() {
-  $("count").textContent = notebook.count;
   grid.replaceChildren();
   const collected = notes
     .filter((n) => notebook.collected.has(n.id))
     .sort(
       (a, b) => notebook.collected.get(b.id) - notebook.collected.get(a.id),
     );
+  // Count only collected notes that remain approved; retain history for reapprovals.
+  $("count").textContent = collected.length;
   panel.querySelector(".collection-empty").hidden = collected.length > 0;
   panel.querySelector(".collection-footnote").textContent =
-    notebook.count > collected.length
-      ? "Some previously collected notes are no longer available."
-      : "Open a heart to read it again.";
+    "Open a heart to read it again.";
   for (const note of collected) {
     const button = document.createElement("button");
     button.className = "keepsake";
@@ -124,7 +123,10 @@ async function draw(source = "r2", id = null, control = target) {
   // Play in the user gesture, before awaiting the data adapter.
   if (source === "r2") { audio.play(); scene?.signalNote(); }
   try {
-    if (source === "r2") notes = await adapter.list();
+    if (source === "r2") {
+      notes = await adapter.list();
+      renderCollection();
+    }
     const note =
       source === "collection" ? await adapter.get(id) : notebook.choose(notes);
     if (!note) {

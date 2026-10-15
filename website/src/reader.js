@@ -14,6 +14,27 @@ export function createReader({
     left = document.querySelector(".cover-left"),
     right = document.querySelector(".cover-right"),
     close = document.querySelector("#reader-close");
+  const photoButton = document.querySelector("#reader-photo-open");
+  const photoViewer = document.createElement("dialog");
+  photoViewer.className = "photo-viewer";
+  photoViewer.setAttribute("aria-label", "Enlarged sender photo");
+  photoViewer.innerHTML = '<button type="button" aria-label="Close enlarged photo"><img alt="" /><span>Tap to return to the note</span></button>';
+  document.body.append(photoViewer);
+  const enlargedPhoto = photoViewer.querySelector("img");
+  const closePhoto = () => {
+    if (photoViewer.open) photoViewer.close();
+    enlargedPhoto.removeAttribute("src");
+  };
+  photoViewer.addEventListener("click", closePhoto);
+  photoViewer.addEventListener("close", () => enlargedPhoto.removeAttribute("src"));
+  photoButton.addEventListener("click", event => {
+    event.stopPropagation();
+    const photo = document.querySelector("#reader-photo");
+    if (notebook.state !== "reading" || photo.hidden || !photo.getAttribute("src")) return;
+    enlargedPhoto.src = photo.src;
+    enlargedPhoto.alt = photo.alt;
+    photoViewer.showModal();
+  });
   const letterContent = [...paper.children].filter(node => !node.classList.contains("open-heart-paper"));
   const paperStops = [...paper.querySelectorAll("#open-paper-gradient stop")];
   left.innerHTML = heartSVG;
@@ -44,11 +65,18 @@ export function createReader({
     document.querySelector("#reader-message").textContent = note.message;
     document.querySelector("#reader-sender").textContent = note.sender;
     const photo = document.querySelector("#reader-photo");
+    closePhoto();
+    photoButton.hidden = true;
+    paper.classList.toggle("has-photo", Boolean(note.photoUrl));
     photo.hidden = true;
     photo.removeAttribute("src");
     photo.alt = `Photo shared by ${note.sender}`;
-    photo.onload = () => { photo.hidden = !photo.getAttribute('src'); };
-    photo.onerror = () => { photo.hidden = true; };
+    photo.onload = () => {
+      photo.hidden = !photo.getAttribute('src');
+      photoButton.hidden = photo.hidden;
+      paper.classList.toggle('has-photo', !photo.hidden);
+    };
+    photo.onerror = () => { photo.hidden = true; photoButton.hidden = true; paper.classList.remove('has-photo'); };
     if (note.photoUrl) photo.src = note.photoUrl;
     document.querySelector("#letter-number").textContent =
       "";
@@ -156,6 +184,7 @@ export function createReader({
   }
   async function shut() {
     if (notebook.state !== "reading") return;
+    closePhoto();
     setState("closing");
     root.classList.remove("reading");
     paper.inert = true;
@@ -201,8 +230,10 @@ export function createReader({
       shut();
     }
     if (e.key === "Tab" && notebook.state === "reading") {
+      const controls = photoButton.hidden ? [close] : [close, photoButton];
+      const current = controls.indexOf(document.activeElement);
       e.preventDefault();
-      close.focus();
+      controls[(current + (e.shiftKey ? -1 : 1) + controls.length) % controls.length].focus();
     }
   });
   const recenter = () => {
@@ -232,6 +263,7 @@ export function createReader({
     open,
     close: shut,
     fail() {
+      closePhoto();
       timeline?.kill();
       gsap.killTweensOf([stage, paper, left, right, ...letterContent, ...paperStops]);
       bob?.kill();

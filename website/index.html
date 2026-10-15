@@ -121,7 +121,6 @@
             ><button id="reset-demo" hidden>Reset demo</button>
           </div>
 
-          <span class="footer-star" aria-hidden="true">✦</span>
         </footer>
         <button id="galaxy-scroll-cue" class="galaxy-scroll-cue" type="button">
           <span>Scroll for a final message</span
@@ -158,7 +157,7 @@
           class="reader"
           role="dialog"
           aria-modal="true"
-          aria-labelledby="reader-title"
+          aria-label="A note for Ms. Daire"
           aria-describedby="reader-message"
           hidden
         >
@@ -224,10 +223,13 @@
                 </button>
               </div>
               <span class="letter-heart" aria-hidden="true">♡</span>
-              <h2 id="reader-title">Dear Ms. Daire,</h2>
+              <p class="letter-recipient">To Ms. Daire</p>
               <p id="reader-message" class="letter-message"></p>
-              <div class="signature">
+              <button id="reader-photo-open" class="photo-open" type="button" aria-label="Enlarge sender photo" hidden>
                 <img id="reader-photo" class="sender-photo" alt="" hidden />
+              </button>
+              <div class="signature">
+                <span>From</span>
                 <strong id="reader-sender"></strong>
               </div>
               <div class="letter-bottom">
