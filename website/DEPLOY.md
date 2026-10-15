@@ -14,15 +14,61 @@ Follow [SUPABASE-SETUP.md](./SUPABASE-SETUP.md) through the local submission-and
 
 Keep their real values out of GitHub and chat. Put them in `website/.env.local` locally and in Vercel's Environment Variables later. `.env.example` contains placeholders you can safely publish. Do not rename the server settings with a `VITE_` prefix.
 
-## 2. Publish the project to GitHub
+## 2. Publish the project using GitHub Desktop on your Mac
 
-1. Open GitHub Desktop and sign in.
-2. Choose **File → Add Local Repository** and select the project folder containing `website/`. For the prepared Downloads copy, this is `Ms-Daire-Cursor-Kit 2/project`.
-3. Review the changed files. Include `website/src`, `website/api`, `website/server`, `website/supabase`, the configuration files, and the supplied models/audio under `website/public`. Keep asset credits.
-4. Confirm that `.env.local`, `node_modules`, `dist`, and `dist-demo` are absent from the files being committed. The supplied ignore rules exclude them.
-5. Commit your changes, then click **Publish repository**. Choose a name and visibility. If the repository already exists on GitHub, use **Push origin** instead.
+A **repository** is your project folder with its saved change history. A **commit** saves a checkpoint on your Mac; **Publish repository** or **Push origin** uploads those checkpoints to GitHub. The prepared `project` folder already has a local repository, so add that existing folder to Desktop.
 
-Use GitHub Desktop or Git for this project. Some included models exceed the browser uploader's 25 MiB limit; Git accepts individual files up to 100 MiB. [GitHub file-size documentation](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github).
+### A. Sign in and select the correct folder
+
+1. Open **GitHub Desktop**. If prompted, choose **Sign in to GitHub.com**, complete the browser sign-in, and return to the app. If needed, account settings are under **GitHub Desktop → Settings → Accounts**.
+2. In the Mac menu bar at the top of your screen, choose **File → Add Local Repository…**.
+3. Click **Choose…**. In the Finder window, press **Command + Shift + G**, paste this path, then press **Return**:
+
+   ```text
+   /Users/sebastian/Downloads/Ms-Daire-Cursor-Kit 2/project
+   ```
+
+4. Select that folder and click **Open**, then **Add Repository** in GitHub Desktop.
+5. The **Current Repository** selector near the top left should now show `project` (or the name you previously gave it). Use **Repository → Show in Finder** to confirm that it points to the path above.
+
+Select the folder named **project**, which contains `website`, the guides, and `.gitignore`. Keep editing this same copy in Cursor. Selecting `website` alone or the outer kit folder can select the wrong repository. If Desktop says the folder is already added, select it from **Current Repository**. If it says the folder is not a Git repository, check the exact path above first; this prepared copy already has Git history.
+
+[GitHub's instructions for adding a local repository](https://docs.github.com/en/desktop/adding-and-cloning-repositories/adding-a-repository-from-your-local-computer-to-github-desktop).
+
+### B. Review and commit the current changes
+
+1. Open the **Changes** tab on the left. Each checked file will be included in your next commit. Click a filename to see its changes on the right.
+2. Include the website source and setup files: `website/index.html`, `website/src`, `website/api`, `website/server`, `website/supabase`, package/configuration files, and the supplied assets under `website/public`. Include the updated guides and preserve asset credits. Previously committed files will already be in **History**, so they will not all appear under Changes.
+3. Check that your real settings file, **`website/.env.local`**, is absent from Changes. It is intentionally ignored. `.env.example` contains placeholders and is safe to include. `node_modules`, `dist`, and `dist-demo` should also be absent.
+4. If you see **`website/env.local` without the leading dot**, leave it unchecked: that is a different filename and is not covered by the existing `.env*` rule. Keep real settings in `.env.local`. Also leave stray files named `website/vite` or `website/ms-daires-galaxy@0.1.0` unchecked if they appear; they are not project files.
+5. At the bottom left, enter a **Summary**, for example `Prepare Ms. Daire website for deployment`. The longer description is optional.
+6. Click **Commit to main** (or **Commit to** the branch shown in your app). If it asks for your Git author name and email, complete that prompt, then commit.
+7. Once everything you intended to save is committed, Changes should be empty except for any stray files you deliberately left unchecked. If Desktop already says **No local changes**, your checkpoints are already saved; continue to publishing.
+
+You do not need to run a build or upload the generated `dist` folder to GitHub. Vercel builds the website from the source code.
+
+### C. Publish the repository
+
+1. Click **Publish repository** near the top of GitHub Desktop.
+2. In **Name**, enter a repository name such as `ms-daire-galaxy`.
+3. Optionally add a description, such as `A galaxy of get-well notes for Ms. Daire`.
+4. Leave **Keep this code private** checked if you want only you and invited collaborators to see the code. You can deploy a public website from this private repository. Uncheck it if you want the club to browse the code publicly.
+5. If an **Organization** selector appears, choose your personal account / **None**, unless you intend to publish to a club organization you control.
+6. Click **Publish Repository** and wait for the upload to finish. The models may make the first upload take a little while.
+7. Choose **Repository → View on GitHub** to open the uploaded repository in your browser.
+8. Confirm that its top level contains **website**. Open that folder and confirm that `index.html`, `package.json`, `src`, `api`, and `public` are present. Your `.env.local` must not be there. Files that were unchecked and never committed stay on your computer.
+
+[GitHub's instructions for publishing an existing project](https://docs.github.com/en/desktop/adding-and-cloning-repositories/adding-an-existing-project-to-github-using-github-desktop).
+
+If Desktop already shows **Push origin** instead of **Publish repository**, the project is already connected to an online repository. Check **Repository → View on GitHub** to verify the destination, then click **Push origin** to upload your new commits there. **Fetch origin** checks for remote updates; it does not create a missing commit.
+
+### D. Send future website updates
+
+After editing this same project in Cursor: save your files, return to GitHub Desktop, review **Changes**, enter a Summary, click **Commit to main**, then **Push origin**. Once Vercel is connected in the next section, pushes to its production branch trigger a new deployment. Changes saved only on your Mac do not update the deployed website.
+
+For this workflow, do not drag the project into GitHub's browser upload page. Some included models exceed that uploader's 25 MiB limit; ordinary Git supports individual files up to 100 MiB. [GitHub file-size documentation](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github).
+
+When the browser shows your uploaded code, continue below. In Vercel you will select this repository and set **Root Directory** to **website**.
 
 ## 3. Import it into Vercel
 
