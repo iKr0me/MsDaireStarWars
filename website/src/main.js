@@ -34,14 +34,13 @@ let scene,
   reader,
   composer,
   journey,
-  paused = false,
   audioGateActive = true,
   panelWasOpen = false,
   previousFocus = null;
 createAudioWelcome({audio,onClose({musicFailed}){
   audioGateActive=false; soundUI();musicUI();syncScrollLock();
   if(musicFailed)status('Music could not start. Try the music control.',4000);
-  $('motion-toggle').focus({preventScroll:true});
+  $('music-toggle').focus({preventScroll:true});
 }});
 let statusTimer;
 function status(message, timeout = 0) {
@@ -198,17 +197,6 @@ soundUI();
 $("effects-toggle").addEventListener("click", () => {
   audio.toggle();
   soundUI();
-});
-$("motion-toggle").addEventListener("click", () => {
-  paused = !paused;
-  scene?.setPaused(paused);
-  galaxy.classList.toggle("paused", paused);
-  $("motion-toggle").textContent = paused ? "▷" : "Ⅱ";
-  $("motion-toggle").setAttribute("aria-pressed", String(paused));
-  $("motion-toggle").setAttribute(
-    "aria-label",
-    paused ? "Resume ambient motion" : "Pause ambient motion",
-  );
 });
 $("credits-open").addEventListener("click", () => {
   if (notebook.busy || composer?.active) return;
